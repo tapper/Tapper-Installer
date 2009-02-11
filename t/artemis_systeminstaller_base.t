@@ -8,7 +8,7 @@ use Test::MockModule;
 
 
 
-BEGIN { use_ok('Artemis::Installer::Client::Precondition'); }
+BEGIN { use_ok('Artemis::Installer::Precondition'); }
 
 
 {
@@ -17,14 +17,14 @@ BEGIN { use_ok('Artemis::Installer::Client::Precondition'); }
         my $sys_hostname = new Test::MockModule('Sys::Hostname');
         $sys_hostname->mock('hostname', sub { return 'bascha' });        
 
-        my $inst=new Artemis::Installer::Client::Precondition;
+        my $inst=new Artemis::Installer::Precondition;
         is (Sys::Hostname::hostname(), 'bascha', 'mocking worked');
         is ($inst->gethostname(), 'bascha', "gethostname by ip");
 }
 
 # get_file_type checks in two ways. 
 # First it analyses the file suffix. For this, the file does not need to exists.
-my $inst_base = new Artemis::Installer::Client::Precondition;
+my $inst_base = new Artemis::Installer::Precondition;
 is ($inst_base->get_file_type('/tmp/1.iso'), 'iso', 'Detected ISO using extenstion.');
 is ($inst_base->get_file_type('/tmp/2.tar.gz'), 'gzip', 'Detected tar.gz using extension.');
 is ($inst_base->get_file_type('/tmp/3.tgz'), 'gzip', 'Detected tgz using extension.');
