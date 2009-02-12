@@ -7,7 +7,7 @@ use Method::Signatures;
 use Moose;
 
 use Artemis;
-use Artemis::Config::Consumer;
+use Artemis::Installer::Config;
 use Artemis::Installer::Precondition::Image;
 use Artemis::Installer::Precondition::Package;
 use Artemis::Installer::Precondition::Copyfile;
@@ -87,7 +87,7 @@ method system_install()
 {
         my $retval;
         # fetch configurations from the server
-        my $consumer = Artemis::Config::Consumer->new;
+        my $consumer = Artemis::Installer::Config->new;
         
         # try to get host for error reporting as soon as possible
         my $host = $consumer->get_artemis_host();

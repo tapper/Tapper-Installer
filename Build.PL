@@ -28,7 +28,6 @@ my $builder = $build_class->new
                        },
      requires => {
                   'perl'                        => '5.010',
-                  'Artemis::Config'             => '2.0100042',
                   'File::Basename'              => 0,
                   'File::Path'                  => 0,
                   'File::Type'                  => 0,
