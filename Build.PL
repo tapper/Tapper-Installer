@@ -31,6 +31,7 @@ my $builder = $build_class->new
                   'File::Basename'              => 0,
                   'File::Path'                  => 0,
                   'File::Type'                  => 0,
+                  'Getopt::Long'                => 0,
                   'Hash::Merge::Simple'         => 0,
 
                   'IPC::Open3'                  => 0,
@@ -38,9 +39,13 @@ my $builder = $build_class->new
                   'Log::Log4perl'               => 0,
                   'Method::Signatures'          => 0,
                   'Moose'                       => 0,
+                  'Net::TFTP'                   => 0,
+
                   'Socket'                      => 0,
                   'Sys::Hostname'               => 0,
                   'YAML'                        => 0,
+                  'YAML::Syck'                  => 0,
+
                  },
      add_to_cleanup      => [ 'Artemis-*' ],
     );
