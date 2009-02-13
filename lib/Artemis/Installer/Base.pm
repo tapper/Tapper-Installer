@@ -6,7 +6,6 @@ use warnings;
 use Method::Signatures;
 use Moose;
 
-use Artemis;
 use Artemis::Installer::Config;
 use Artemis::Installer::Precondition::Image;
 use Artemis::Installer::Precondition::Package;

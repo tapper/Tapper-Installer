@@ -12,8 +12,6 @@ use Sys::Hostname;
 use YAML;
 
 
-use Artemis;
-
 extends 'Artemis::Installer';
 
 =head1 NAME
