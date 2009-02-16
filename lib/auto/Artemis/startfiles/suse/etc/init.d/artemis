@@ -1,0 +1,34 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Required-Start:  $ALL
+# Default-Start: 3 5 
+# Default-Stop: 1 6
+# Description: (suse) Start artemis program run control
+### END INIT INFO
+# chkconfig: 35 99 99
+# description: (suse) Start artemis program run control
+
+# ss5 sschwigo 2008-09-29 TODO: that's a dirty hack
+# mount natrium:/vol/osrc_home/ /home
+
+
+STARTSCRIPT=
+POSSIBLE_PATHS="
+/mnt/opt/artemis/bin/artemis-automatic-test.pl
+/opt/artemis/bin/artemis-automatic-test.pl
+/home/artemis/perl510/bin/artemis-automatic-test.pl
+"
+while (( 1 )); do
+    for STARTSCRIPT in $POSSIBLE_PATHS; do
+        if [[ -e $STARTSCRIPT ]]
+        then
+            $STARTSCRIPT $*
+            exit 0
+        fi
+    done
+    mount natrium:/vol/osrc_home/ /home
+    echo "Wait for auto mount /home/artemis ..."
+    sleep 2
+done
+$STARTSCRIPT $*

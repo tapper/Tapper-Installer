@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# show IP addressed of all active network cards. This is the easiest way to do it.
+
+
+#needed for NFS
+/etc/init.d/portmap start
+
+STARTSCRIPT=
+POSSIBLE_PATHS="
+/mnt/opt/artemis/bin/artemis-automatic-test.pl
+/opt/artemis/bin/artemis-automatic-test.pl
+/home/artemis/perl510/bin/artemis-automatic-test.pl
+"
+while (( 1 )); do
+    for STARTSCRIPT in $POSSIBLE_PATHS; do
+        if [[ -e $STARTSCRIPT ]]
+        then
+            /sbin/ifconfig
+            $STARTSCRIPT $*
+            exit 0
+        fi
+    done
+    mount natrium:/vol/osrc_home/ /home
+    echo "Wait for auto mount /home/artemis ..."
+    sleep 2
+done
+

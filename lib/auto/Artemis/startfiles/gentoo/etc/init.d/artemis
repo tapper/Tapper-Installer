@@ -1,0 +1,26 @@
+#!/sbin/runscript
+# Copyright 1999-2007 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+depend() {
+        after *
+}
+
+start() {
+        ebegin "(gentoo) Starting artemis program run control"
+
+        STARTSCRIPT=/home/artemis/perl510/bin/artemis-automatic-test.pl
+
+        while ( [ ! -e $STARTSCRIPT ] ) ; do
+            echo "(redhat) Wait for auto mount /home/artemis ..."
+            sleep 2
+        done
+        
+        $STARTSCRIPT $*
+        eend $? "Failed to start local"
+}
+
+stop() {
+        ebegin "Nothing to do"
+}
+
