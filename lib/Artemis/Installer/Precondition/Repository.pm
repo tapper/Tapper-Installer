@@ -1,4 +1,4 @@
-package Artemis::Installer::Client::Precondition::Repository;
+package Artemis::Installer::Precondition::Repository;
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ use warnings;
 use File::Basename;
 use Method::Signatures;
 use Moose;
-extends 'Artemis::Installer::Client::Precondition';
+extends 'Artemis::Installer::Precondition';
 
 
 =head1 NAME

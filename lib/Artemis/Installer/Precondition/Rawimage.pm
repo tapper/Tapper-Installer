@@ -1,4 +1,4 @@
-package Artemis::Installer::Client::Precondition::Rawimage;
+package Artemis::Installer::Precondition::Rawimage;
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ use warnings;
 use File::Path;
 use Method::Signatures;
 use Moose;
-extends 'Artemis::Installer::Client::Precondition';
+extends 'Artemis::Installer::Precondition';
 
 
 =head1 NAME

@@ -1,4 +1,4 @@
-package Artemis::Installer::Client::Precondition::PRC;
+package Artemis::Installer::Precondition::PRC;
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use File::ShareDir      'module_file';
 use Method::Signatures;
 use Moose;
 use YAML;
-extends 'Artemis::Installer::Client::Precondition';
+extends 'Artemis::Installer::Precondition';
 
 
 =head1 NAME

@@ -1,4 +1,4 @@
-package Artemis::Config::Consumer;
+package Artemis::Installer::Config;
 
 use strict;
 use warnings;
