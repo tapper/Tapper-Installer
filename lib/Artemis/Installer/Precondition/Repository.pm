@@ -11,11 +11,11 @@ extends 'Artemis::Installer::Precondition';
 
 =head1 NAME
 
-Artemis::Installer::Client::Precondition::Repository - Install a repository to a given location
+Artemis::Installer::Precondition::Repository - Install a repository to a given location
 
 =head1 SYNOPSIS
 
- use Artemis::Installer::Client::Precondition::Repository;
+ use Artemis::Installer::Precondition::Repository;
 
 =head1 FUNCTIONS
 

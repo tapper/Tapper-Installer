@@ -14,11 +14,11 @@ extends 'Artemis::Installer::Precondition';
 
 =head1 NAME
 
-Artemis::Installer::Client::Precondition::PRC - Install Program Run Control to a given location
+Artemis::Installer::Precondition::PRC - Install Program Run Control to a given location
 
 =head1 SYNOPSIS
 
- use Artemis::Installer::Client::Precondition::PRC;
+ use Artemis::Installer::Precondition::PRC;
 
 =head1 FUNCTIONS
 
@@ -146,7 +146,7 @@ method install($prc)
         close FILE;
         
         if ($prc->{artemis_package}) {
-                my $pkg_object=Artemis::Installer::Client::Precondition::Package->new($self->cfg);
+                my $pkg_object=Artemis::Installer::Precondition::Package->new($self->cfg);
                 my $package={filename => basename($prc->{artemis_package}),
                              path => dirname($prc->{artemis_package})};
                 $self->logdie($retval) if $retval = $pkg_object->install($package);

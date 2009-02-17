@@ -11,7 +11,7 @@ use Artemis;
 
 with 'MooseX::Log::Log4perl';
 
-our $VERSION = '2.000003';
+our $VERSION = '2.000005';
 
 =head1 NAME
 

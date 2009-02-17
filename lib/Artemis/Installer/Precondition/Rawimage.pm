@@ -11,11 +11,11 @@ extends 'Artemis::Installer::Precondition';
 
 =head1 NAME
 
-Artemis::Installer::Client::Precondition::Rawimage - Create a raw image to be used as guest root for virtualisation
+Artemis::Installer::Precondition::Rawimage - Create a raw image to be used as guest root for virtualisation
 
 =head1 SYNOPSIS
 
- use Artemis::Installer::Client::Precondition::Rawimage;
+ use Artemis::Installer::Precondition::Rawimage;
 
 =head1 FUNCTIONS
 
