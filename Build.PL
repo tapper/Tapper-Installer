@@ -15,7 +15,7 @@ HERE
 
 my $builder = $build_class->new
     (
-     module_name         => 'Artemis::PRC',
+     module_name         => 'Artemis::Installer',
      license             => 'restrictive',
      dist_author         => 'OSRC SysInt Team <osrc-sysint@elbe.amd.com>',
      dist_version_from   => 'lib/Artemis/Installer.pm',
