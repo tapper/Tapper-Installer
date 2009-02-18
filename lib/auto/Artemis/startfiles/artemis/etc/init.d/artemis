@@ -7,17 +7,19 @@
 /etc/init.d/portmap start
 
 STARTSCRIPT=
+FILENAME="artemis-automatic-test.pl"
 POSSIBLE_PATHS="
-/mnt/opt/artemis/bin/artemis-automatic-test.pl
-/opt/artemis/bin/artemis-automatic-test.pl
-/home/artemis/perl510/bin/artemis-automatic-test.pl
+/mnt/opt/artemis/bin/
+/opt/artemis/bin/
+/home/artemis/perl510/bin/
 "
 while (( 1 )); do
-    for STARTSCRIPT in $POSSIBLE_PATHS; do
+    for DIR in $POSSIBLE_PATHS; do
+        STARTSCRIP=${DIR}/$FILENAME
         if [[ -e $STARTSCRIPT ]]
         then
             /sbin/ifconfig
-            $STARTSCRIPT $*
+            ${DIR}/perl $STARTSCRIPT $*
             exit 0
         fi
     done
