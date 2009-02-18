@@ -50,6 +50,7 @@ my $builder = $build_class->new
      add_to_cleanup      => [ 'Artemis-*' ],
     );
 
+$builder->add_build_element('libauto');
 $builder->create_build_script();
 
 1;
