@@ -24,7 +24,7 @@ POSSIBLE_PATHS="
 "
 while (( 1 )); do
     for DIR in $POSSIBLE_PATHS; do
-        STARTSCRIP=${DIR}/$FILENAME
+        STARTSCRIPT=${DIR}/$FILENAME
         if [[ -e $STARTSCRIPT ]]
         then
             /sbin/ifconfig

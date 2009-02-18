@@ -9,14 +9,31 @@ depend() {
 start() {
         ebegin "(gentoo) Starting artemis program run control"
 
-        STARTSCRIPT=/home/artemis/perl510/bin/artemis-automatic-test.pl
+#needed for NFS
+        /etc/init.d/portmap start
 
-        while ( [ ! -e $STARTSCRIPT ] ) ; do
-            echo "(redhat) Wait for auto mount /home/artemis ..."
+        STARTSCRIPT=
+        FILENAME="artemis-automatic-test.pl"
+        POSSIBLE_PATHS="
+/mnt/opt/artemis/bin/
+/opt/artemis/bin/
+/home/artemis/perl510/bin/
+"
+        while (( 1 )); do
+            for DIR in $POSSIBLE_PATHS; do
+                STARTSCRIPT=${DIR}/$FILENAME
+                if [[ -e $STARTSCRIPT ]]
+                then
+                    /sbin/ifconfig
+                    ${DIR}/perl $STARTSCRIPT $*
+                    exit 0
+                fi
+            done
+            mount natrium:/vol/osrc_home/ /home
+            echo "Wait for auto mount /home/artemis ..."
             sleep 2
         done
-        
-        $STARTSCRIPT $*
+
         eend $? "Failed to start local"
 }
 
