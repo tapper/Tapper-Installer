@@ -36,16 +36,15 @@ This function encapsulates installing one single package. At the moment, .tar,
 method install ($package)
 {
         my $filename = $package->{filename};
-        my $path     = $package->{path};
-	$self->log->debug("installing $filename from $path");
+	$self->log->debug("installing $filename");
 
         my $basedir     = $self->cfg->{paths}{base_dir};
         my $package_dir = '';
-        $package_dir    = $self->cfg->{paths}{package_dir} unless $path =~m(^/);
-        my $pkg         = "$package_dir/$path/$filename";
+        $package_dir    = $self->cfg->{paths}{package_dir} unless $filename =~m(^/);
+        my $pkg         = "$package_dir/$filename";
           
         my ($error, $type) = $self->get_file_type("$pkg");
-        return("Can't get file type of $path/$filename: $type") if $error;
+        return("Can't get file type of $filename: $type") if $error;
 
 
         my $output;
