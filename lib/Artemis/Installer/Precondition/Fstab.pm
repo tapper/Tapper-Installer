@@ -42,7 +42,6 @@ method install($precond)
 
         my $cmd = '(echo "" ; echo "# precond::fstab" ; echo "'.$line.'" ) >> '.$basedir.'/etc/fstab';
 
-        print STDERR ("$cmd\n");
         $self->log->debug($cmd);
 
         system($cmd) == 0 or return ("Could not patch /etc/fstab: $!");
