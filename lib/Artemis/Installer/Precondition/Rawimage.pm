@@ -13,6 +13,8 @@ extends 'Artemis::Installer::Precondition';
 
 Artemis::Installer::Precondition::Rawimage - Create a raw image to be used as guest root for virtualisation
 
+This precondition should only be created when parsing "virt" preconditions. It's not useful for kernel developers.
+
 =head1 SYNOPSIS
 
  use Artemis::Installer::Precondition::Rawimage;
@@ -36,7 +38,7 @@ method install($img)
 {
         return "not filename given for rawimage" if not $img->{name};
 
-        my $img_size = 500*1024; # 100MByte - size of standard rawimage in kbyte 
+        my $img_size = 500*1024; # 500MByte - size of standard rawimage in kbyte 
 
         my $filename = $img->{name};
         my $path     = $self->cfg->{paths}{base_dir}.$img->{path};
