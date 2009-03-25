@@ -24,7 +24,7 @@ Artemis::Installer::Precondition::Copyfile - Install a file to a given location
 
 =head2 install
 
-This function encapsulates installing one single file. ssh, nfs, rsync and
+This function encapsulates installing one single file. scp, nfs and
 local are supported protocols.
 
 @param hash reference - contains all information about the file
@@ -50,8 +50,8 @@ method install($file)
                 $retval = $self->install_rsync($file)
         } elsif ($file->{protocol} eq 'local') {
                 $retval = $self->install_local($file)
-        } elsif ($file->{protocol} eq 'ssh') {
-                $retval = $self->install_ssh($file)
+        } elsif ($file->{protocol} eq 'scp') {
+                $retval = $self->install_scp($file)
         } else {
                 return 'File '.$file->{name}.' has unknown protocol type '.$file->{protocol};
         }
@@ -77,11 +77,11 @@ method install_local($file) {
 	my $dest_filename = '';   # get rid of the "uninitialised" warning
         my ($dest_path, $retval);
 
-        if ($file->{dest}=~m(/$)) {
-                $dest_path=$file->{dest};
+        if ($file->{dest} =~ m(/$)) {
+                $dest_path =  $file->{dest};
         } else {
                 ($dest_filename, $dest_path, undef) = fileparse($file->{dest});
-                $dest_path.='/' if $dest_path !~ m(/$);
+                $dest_path .= '/' if $dest_path !~ m(/$);
         }
         return $retval if $retval = $self->make_dir($dest_path);
 
@@ -127,7 +127,7 @@ method install_nfs($file)
 };
 
 
-=head2 install_ssh
+=head2 install_scp
 
 Install a file using scp.
 
@@ -138,7 +138,7 @@ Install a file using scp.
 
 =cut
 
-method install_ssh($file)
+method install_scp($file)
 {
         my $dest = $self->cfg->{paths}{base_dir}.$file->{dest};
 
