@@ -147,8 +147,7 @@ method install($prc)
         
         if ($prc->{artemis_package}) {
                 my $pkg_object=Artemis::Installer::Precondition::Package->new($self->cfg);
-                my $package={filename => basename($prc->{artemis_package}),
-                             path => dirname($prc->{artemis_package})};
+                my $package={filename => $prc->{artemis_package}};
                 $self->logdie($retval) if $retval = $pkg_object->install($package);
         }
 
