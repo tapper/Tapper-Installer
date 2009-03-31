@@ -104,14 +104,14 @@ method system_install()
         $self->log->info("Starting installation of test machine");
         $self->mcp_inform("start-install");
 
+        my $image=Artemis::Installer::Precondition::Image->new($config);
         $self->logdie("First precondition is not the root image") 
           if not $config->{preconditions}->[0]->{precondition_type} eq 'image' 
             and $config->{preconditions}->[0]->{mount} eq '/';
-
+        
         foreach my $precondition (@{$config->{preconditions}}) {
                 if ($precondition->{precondition_type} eq 'image')
                 {
-                        my $image=Artemis::Installer::Precondition::Image->new($config);
                         $self->logdie($retval) if $retval = $self->precondition_install($precondition, $image);
                 }
                 elsif ($precondition->{precondition_type} eq 'package')
@@ -151,7 +151,6 @@ method system_install()
                 }
         }
 
-        my $image=Artemis::Installer::Precondition::Image->new($config);
         $self->logdie($retval) if $retval = $image->prepare_boot();
 
         $self->mcp_inform("end-install");

@@ -283,7 +283,8 @@ method install($image)
                 return $retval if $retval=$self->log_and_exec("mount $partition $mount_point");
                 
         }
-        
+        push (@{$self->cfg->{images}},$image);
+
         $self->log->debug("Image copied successfully");
 
         return 0;
