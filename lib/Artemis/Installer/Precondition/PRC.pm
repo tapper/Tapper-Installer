@@ -47,17 +47,12 @@ method create_config($prc)
         if ($prc->{config}->{guest_count})
         {
                 $config->{guest_count} = $prc->{config}->{guest_count};
-                $config->{server}      = 'localhost';
                 $config->{mcp_server}  = $self->{cfg}->{server};
                 $config->{timeouts}    = $prc->{config}->{timeouts};
         }
-        elsif ($prc->{mountpartition} or $prc->{mountfile})
-        {
-                $config->{server}      = $self->{cfg}->{hostname};
-        }
         else
         {
-                $config->{server}      = $self->{cfg}->{server};
+                $config->{mcp_server}      = $self->{cfg}->{server};
         }
         
         $config->{report_server}   = $self->{cfg}->{report_server};
