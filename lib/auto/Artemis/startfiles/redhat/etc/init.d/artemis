@@ -10,7 +10,10 @@
 # description: (redhat) Start artemis program run control
 
 #needed for NFS
-/etc/init.d/portmap start
+if [[ -e /etc/init.d/portmap ]]
+then
+	/etc/init.d/portmap start
+fi
 
 STARTSCRIPT=
 FILENAME="artemis-automatic-test.pl"
