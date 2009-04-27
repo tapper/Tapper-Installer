@@ -4,8 +4,10 @@ DEST_DIR_DEVEL=/data/bancroft/artemis/development/nfsroot/installation_base/opt/
 
 
 live:
+	./scripts/dist_upload_wotan.sh
 	sudo rsync -ruv  ${SOURCE_DIR}/Installer.pm ${DEST_DIR} 
 	sudo rsync -ruv  ${SOURCE_DIR}/Installer/ ${DEST_DIR}/Installer/
 devel:
+	./scripts/dist_upload_wotan.sh
 	sudo rsync -ruv  ${SOURCE_DIR}/Installer.pm ${DEST_DIR_DEVEL} 
 	sudo rsync -ruv  ${SOURCE_DIR}/Installer/ ${DEST_DIR_DEVEL}/Installer/ 
