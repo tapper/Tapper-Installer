@@ -6,6 +6,7 @@ use warnings;
 use Method::Signatures;
 use Moose;
 use Socket;
+use YAML::Syck;
 
 use Artemis;
 
@@ -49,15 +50,17 @@ Tell the MCP server our current status. This is done using a TCP connection.
 
 method mcp_inform($msg)
 {
-        my $server = $self->cfg->{mcp_host};
-        my $port   = $self->cfg->{mcp_port};
+        my $server  = $self->cfg->{mcp_host};
+        my $port    = $self->cfg->{mcp_port};
+        my $message = {state => $msg};
+        my $yaml    = Dump($message);
 
         $self->log->debug(qq(Sending status message "$msg" to MCP host "$server" on port $port));
 
 	if (my $sock = IO::Socket::INET->new(PeerAddr => $server,
 					     PeerPort => $port,
 					     Proto    => 'tcp')){
-		$sock->print($msg,"\n");
+		$sock->print($yaml);
 		close $sock;
 	} else {
 		$self->log->warn("Can't connect to MCP: $!");
