@@ -67,14 +67,14 @@ method install ($exec)
 	} else {
                 close $write;
                 my $select = new IO::Select( $read );
-                my $output;
+                my ($error, $output);
         MSG_FROM_CHILD:
                 while (my @ready = $select->can_read()){
                         my $tmpout = <$read>;   # only read can be in @ready, since no other FH is in $select
                         last MSG_FROM_CHILD if not $tmpout;
                         $output.=$tmpout;
                 }
-                my ($error, $output)=$self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
+                ($error, $output)=$self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
                 if ($output) {
                         my $outfile = $filename;
                         $outfile =~ s/[^A-Za-z_-]/_/g;
