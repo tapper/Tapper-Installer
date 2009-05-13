@@ -16,18 +16,20 @@ POSSIBLE_PATHS="
 /opt/artemis/bin/
 /home/artemis/perl510/bin/
 "
-while (( 1 )); do
-    for DIR in $POSSIBLE_PATHS; do
-        STARTSCRIPT=${DIR}/$FILENAME
-        if [[ -e $STARTSCRIPT ]]
-        then
-            /sbin/ifconfig
-            ${DIR}/perl $STARTSCRIPT $*
-            exit 0
-        fi
-    done
-    mount natrium:/vol/osrc_home/ /home
-    echo "Wait for auto mount /home/artemis ..."
+while  ! ping -c1 bancroft > /dev/null  ; do
+    echo "wait for network available..."
     sleep 2
 done
+
+mount natrium:/vol/osrc_home/ /home
+for DIR in $POSSIBLE_PATHS; do
+    STARTSCRIPT=${DIR}/$FILENAME
+    if [[ -e $STARTSCRIPT ]]
+    then
+        /sbin/ifconfig
+        ${DIR}/perl $STARTSCRIPT $*
+        exit 0
+    fi
+done
+
 
