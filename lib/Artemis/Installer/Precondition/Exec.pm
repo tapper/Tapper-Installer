@@ -57,9 +57,10 @@ method install ($exec)
 	if ($pid == 0) {
                 close $read;
 		# chroot to execute script inside the future root file system
+                my ($error, $output)=$self->log_and_exec("mount -o bind /dev/ ".$self->cfg->{paths}{base_dir}."/dev");
 		chroot $self->cfg->{paths}{base_dir};
 		chdir ("/");
-                my ($error, $output)=$self->log_and_exec($filename,@options);
+                ($error, $output)=$self->log_and_exec($filename,@options);
                 print( $write $output, "\n") if $output;
                 close $write;
                 exit $error;
@@ -73,6 +74,7 @@ method install ($exec)
                         last MSG_FROM_CHILD if not $tmpout;
                         $output.=$tmpout;
                 }
+                my ($error, $output)=$self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
                 if ($output) {
                         my $outfile = $filename;
                         $outfile =~ s/[^A-Za-z_-]/_/g;
