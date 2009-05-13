@@ -7,7 +7,9 @@ live:
 	./scripts/dist_upload_wotan.sh
 	sudo rsync -ruv  ${SOURCE_DIR}/Installer.pm ${DEST_DIR} 
 	sudo rsync -ruv  ${SOURCE_DIR}/Installer/ ${DEST_DIR}/Installer/
+	sudo rsync -ruv  ${SOURCE_DIR}/../auto/Artemis/ ${DEST_DIR}/../auto/Artemis/
 devel:
 	./scripts/dist_upload_wotan.sh
 	sudo rsync -ruv  ${SOURCE_DIR}/Installer.pm ${DEST_DIR_DEVEL} 
 	sudo rsync -ruv  ${SOURCE_DIR}/Installer/ ${DEST_DIR_DEVEL}/Installer/ 
+	sudo rsync -ruv  ${SOURCE_DIR}/../auto/Artemis/ ${DEST_DIR_DEVEL}/../auto/Artemis/
