@@ -192,7 +192,7 @@ method get_device($device_id)
         } elsif (-e "/dev/".$device_id or -e $device_id) {
                 $dev_symlink = $device_id;
         } else { 
-                return(1, "Device $device_id could not be found");
+                return(1, qq(No device named "$device_id" could be found));
         }
 
         my @linkpath=split("/", $dev_symlink); # split link to avoid /dev/disk/by-xyz/../../hda1, is way faster than regexp
