@@ -23,7 +23,9 @@ POSSIBLE_PATHS="
 /home/artemis/perl510/bin/
 "
 
-while  ! ping -c1 bancroft > /dev/null  ; do
+for(( i=0; i<10; i++)) 
+do
+    ping -c1 bancroft > /dev/null && break
     echo "wait for network available..."
     sleep 2
 done
