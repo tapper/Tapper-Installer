@@ -8,8 +8,6 @@ use Moose;
 use Socket;
 use YAML::Syck;
 
-use Artemis;
-
 with 'MooseX::Log::Log4perl';
 
 our $VERSION = '2.000035';
