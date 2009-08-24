@@ -10,7 +10,7 @@ use YAML::Syck;
 
 with 'MooseX::Log::Log4perl';
 
-our $VERSION = '2.000036';
+our $VERSION = '2.000037';
 
 =head1 NAME
 
@@ -48,24 +48,40 @@ Tell the MCP server our current status. This is done using a TCP connection.
 
 method mcp_inform($msg)
 {
-        my $server  = $self->cfg->{mcp_host};
-        my $port    = $self->cfg->{mcp_port};
         my $message = {state => $msg};
-        my $yaml    = Dump($message);
+        return $self->mcp_send($message);
+};
 
-        $self->log->debug(qq(Sending status message "$msg" to MCP host "$server" on port $port));
 
+
+=head2 mcp_send
+
+Tell the MCP server our current status. This is done using a TCP connection.
+
+@param string - message to send to MCP
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub mcp_send
+{
+        my ($self, $message) = @_;
+        my $server = $self->cfg->{mcp_host} or return "MCP host unknown";
+        my $port   = $self->cfg->{mcp_port} || 7357;
+
+        my $yaml = Dump($message);
 	if (my $sock = IO::Socket::INET->new(PeerAddr => $server,
 					     PeerPort => $port,
 					     Proto    => 'tcp')){
-		$sock->print($yaml);
+		print $sock ("$yaml");
 		close $sock;
 	} else {
-		$self->log->warn("Can't connect to MCP: $!");
-                return(-1);
+                return("Can't connect to MCP: $!");
 	}
         return(0);
-};
+}
 
 =head2  logdie
 
@@ -79,7 +95,7 @@ Tell the MCP server our current status, then die().
 method logdie($msg)
 {
         if ($self->cfg->{mcp_host}) {
-                $self->mcp_inform("error-install:$msg");
+                $self->mcp_send({state => 'error-install', error => $msg});
         } else {
                 $self->log->error("Can't inform MCP, no server is set");
         }
