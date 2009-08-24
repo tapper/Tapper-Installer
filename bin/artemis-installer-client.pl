@@ -1,9 +1,8 @@
-#!/usr/bin/env perl
+#!/opt/artemis/bin/perl
 
 use warnings;
 use strict;
 use Log::Log4perl;
-use Artemis;
 use Artemis::Installer::Base;
 
 BEGIN {
