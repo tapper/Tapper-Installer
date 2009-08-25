@@ -62,4 +62,4 @@ isa_ok($obj, "Artemis::Installer::Base", "Object");
 
 
 
-diag( "Testing Artemis $Artemis::VERSION, Perl $], $^X" );
+diag( "Testing Artemis $Artemis::Installer::VERSION, Perl $], $^X" );
