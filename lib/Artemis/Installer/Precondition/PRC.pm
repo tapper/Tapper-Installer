@@ -91,7 +91,7 @@ method install($prc)
         if (not -d "$basedir/etc/init.d" ) {
                 mkdir("$basedir/etc/init.d") or return "Can't create /etc/init.d/ in $basedir";
         }
-        ($error, $retval) = $self->log_and_exec("cp",module_file('Artemis', "startfiles/$distro/etc/init.d/artemis"),"$basedir/etc/init.d/artemis");
+        ($error, $retval) = $self->log_and_exec("cp",module_file('Artemis::Installer', "startfiles/$distro/etc/init.d/artemis"),"$basedir/etc/init.d/artemis");
         return $retval if $error;
         if ($distro!~/artemis/) {
         
