@@ -79,12 +79,12 @@ method install ($exec)
                         last MSG_FROM_CHILD if not $tmpout;
                         $output.=$tmpout;
                 }
-                ($error, $output)=$self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
                 if ($output) {
                         my $outfile = $filename;
                         $outfile =~ s/[^A-Za-z_-]/_/g;
                         $self->file_save($output,$outfile);
                 }
+                ($error, $output)=$self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
                 waitpid($pid,0);
                 if ($?) {
                         return("executing $filename failed");
