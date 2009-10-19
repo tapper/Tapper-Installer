@@ -1,9 +1,8 @@
 #!/bin/sh
 
 ### BEGIN INIT INFO
-# Required-Start: $network $remote_fs $syslog
-# Required-Stop: $network $remote_fs $syslog
-# Default-Start: 3 5
+# Required-Start:  $ALL
+# Default-Start: 3 5 
 # Default-Stop: 1 6
 # Description: (suse) Start artemis program run control
 ### END INIT INFO
@@ -28,7 +27,7 @@ POSSIBLE_PATHS="
 /home/artemis/perl510/bin/
 "
 
-for(( i=0; i<10; i++))
+for(( i=0; i<10; i++)) 
 do
     ping -c1 bancroft > /dev/null && break
     echo "wait for network available..."
