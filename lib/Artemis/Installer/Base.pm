@@ -31,6 +31,19 @@ Artemis::Installer::Base - Install everything needed for a test.
 =cut
 
 
+method cleanup()
+{
+        my @files_to_clean = ('/var/log/messages','/var/log/syslog');
+ FILE:
+        foreach my $file (@files_to_clean) {
+                my $filename = $self->cfg->{paths}{basedir}."$file";
+                open my $fh, ">", $filename or $self->log->warn("Can not open $filename for cleaning: $!"), next FILE;
+                close $fh or $self->log->warn("Closing PXE grub file $filename of NFS failed: $!");
+        }
+        return 0;
+};
+
+
 =head2 precondition_install
 
 Encapsulate choosing where to install a precondition. Makes system_install
@@ -150,7 +163,9 @@ method system_install()
                         $self->logdie($retval) if $retval = $self->precondition_install($precondition, $exec);
                 }
         }
-
+        
+        $self->cleanup() unless $config->no_cleanup();
+        
         $self->logdie($retval) if $retval = $image->prepare_boot();
 
         $self->mcp_inform("end-install");
