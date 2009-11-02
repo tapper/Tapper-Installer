@@ -69,6 +69,32 @@ method configure_fstab()
         return 0;
 };
 
+=head2 generate_pxe_grub
+
+Generate a simple PXE grub config that forwards to local grub.
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+method generate_pxe_grub()
+{
+        my $hostname = $self->gethostname();
+        my $filename = $self->cfg->{paths}{grubpath}."/$hostname.lst";
+        open my $fh, ">", $filename or return "Can not open PXE grub file $filename: $!";
+        print $fh 
+          "serial --unit=0 --speed=115200\n",
+            "terminal serial\n",
+              "timeout 2\n\n",
+                "title Boot from first hard disc\n",
+                  "\tchainloader (hd0)+1";
+        close $fh or return "Closing PXE grub file $filename of NFS failed: $!";
+        return 0;
+};
+
+
+
 =head2 copy_menu_lst
 
 Copy menu.lst to NFS. We need the grub config file menu.lst on NFS because
@@ -333,7 +359,7 @@ method prepare_boot()
         my $retval = 0;
         return $retval if $retval = $self->configure_fstab();
         return $retval if $retval = $self->generate_grub_menu_lst( );
-	return $retval if $retval = $self->copy_menu_lst();
+	return $retval if $retval = $self->generate_pxe_grub();
         return 0;
 };
 
