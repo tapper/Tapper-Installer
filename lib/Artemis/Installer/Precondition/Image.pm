@@ -42,7 +42,7 @@ method get_partition_label($device_file)
 =head2 configure_fstab
 
 Write fstab on installed system based upon the installed images and
-partitions. 
+partitions.
 
 @return success - 0
 @return error   - error string
@@ -83,12 +83,12 @@ method generate_pxe_grub()
         my $hostname = $self->gethostname();
         my $filename = $self->cfg->{paths}{grubpath}."/$hostname.lst";
         open my $fh, ">", $filename or return "Can not open PXE grub file $filename: $!";
-        print $fh 
+        print $fh
           "serial --unit=0 --speed=115200\n",
             "terminal serial\n",
               "timeout 2\n\n",
                 "title Boot from first hard disc\n",
-                  "\tchainloader (hd0)+1";
+                  "chainloader (hd0)+1";
         close $fh or return "Closing PXE grub file $filename of NFS failed: $!";
         return 0;
 };
@@ -137,8 +137,8 @@ method get_grub_device($device_file)
         return ($error,$grub_device) if $error;
         $grub_device =~ s/[a-z()\/ \s]//g;
 	if ($grub_device eq "") {
-                $self->log->warn( "Grub device not found, took '0'"); 
-                $grub_device = 0; 
+                $self->log->warn( "Grub device not found, took '0'");
+                $grub_device = 0;
   	}
 	return (0,$grub_device);
 };
@@ -176,12 +176,12 @@ method generate_grub_menu_lst()
 {
         my $retval;
 
-        return("First precondition is not the root image") 
-          if not $self->cfg->{preconditions}->[0]->{precondition_type} eq 'image' 
+        return("First precondition is not the root image")
+          if not $self->cfg->{preconditions}->[0]->{precondition_type} eq 'image'
             and $self->cfg->{preconditions}->[0]->{mount} eq '/';
 
         my $partition = $self->cfg->{preconditions}->[0]->{partition};
-        
+
         if ($self->cfg->{grub}) {
                 return $retval if $retval = $self->generate_user_grub_conf($partition);
         } else {
@@ -214,8 +214,8 @@ method create_menu_lst_entry($device_file)
           "root (hd$grub_device,$partition_number)\n".
             "kernel /boot/vmlinuz root=$device_file console=ttyS0,115200 ip=dhcp noapic artemis_host=".$self->cfg->{server}."\n";
         $entry .= "initrd /boot/initrd\n\n" if -e $self->cfg->{base_dir}."/boot/initrd";
-              
-        
+
+
         return $self->write_menu_lst($entry,0);
 };
 
@@ -274,7 +274,7 @@ Install a given image. This function is a wrapper for image
 installer functions so the caller doesn't need to care for preparations.
 
 @param hash reference - containing image name (image), mount point (mount) and
-                        partition name (partition) 
+                        partition name (partition)
 
 @return success - 0
 @return error   - error string
@@ -300,14 +300,14 @@ method install($image)
         # needs it relative to current root
         my $mount_point=$image->{mount};
         $mount_point = $self->cfg->{paths}{base_dir}.$mount_point;
-	$self->create_mount_point($mount_point);        
+	$self->create_mount_point($mount_point);
 
         if ($image->{image}) {
                 return $retval if $retval=$self->copy_image( $partition, $image->{image}, $mount_point);
         } else {
                 $self->log->debug("No image to install on $partition, mounting old image to $mount_point");
                 return $retval if $retval=$self->log_and_exec("mount $partition $mount_point");
-                
+
         }
         push (@{$self->cfg->{images}},$image);
 
@@ -319,7 +319,7 @@ method install($image)
 
 =head2 generate_user_grub_conf
 
-Generate grub config file menu.lst based upon user provided precondition. 
+Generate grub config file menu.lst based upon user provided precondition.
 
 @param string - name of the root partition
 
@@ -339,7 +339,7 @@ method generate_user_grub_conf($device_file)
 
         $conf_string =~ s/\$root/$device_file/g;
         $conf_string =~ s/\$grubroot/(hd$grub_device,$partition_number)/g;
-        
+
         return $self->write_menu_lst($conf_string, "truncate");
 };
 
@@ -355,7 +355,7 @@ Make installed system ready for boot from hard disk.
 =cut
 
 method prepare_boot()
-{       
+{
         my $retval = 0;
         return $retval if $retval = $self->configure_fstab();
         return $retval if $retval = $self->generate_grub_menu_lst( );
@@ -379,10 +379,10 @@ Create the mount point if its not an existing directory.
 method create_mount_point($mount_point)
 {
 	# Creates mount_point if not exists
-        if (not -d $mount_point) { 
+        if (not -d $mount_point) {
                 unlink $mount_point;
                 system("mkdir","-p","$mount_point") and return ("Can't create mount point $mount_point");
-        } 
+        }
         return 0;
 };
 
