@@ -33,12 +33,15 @@ Artemis::Installer::Base - Install everything needed for a test.
 
 method cleanup()
 {
+        $self->log->info('Cleaning up logfiles');
         my @files_to_clean = ('/var/log/messages','/var/log/syslog');
  FILE:
         foreach my $file (@files_to_clean) {
-                my $filename = $self->cfg->{paths}{basedir}."$file";
+                my $filename = $self->cfg->{paths}{base_dir}."$file";
+                next FILE if not -e $filename;
                 open my $fh, ">", $filename or $self->log->warn("Can not open $filename for cleaning: $!"), next FILE;
-                close $fh or $self->log->warn("Closing PXE grub file $filename of NFS failed: $!");
+                print $fh '';
+                close $fh;
         }
         return 0;
 };
