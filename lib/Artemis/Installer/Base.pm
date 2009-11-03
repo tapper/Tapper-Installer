@@ -164,7 +164,7 @@ method system_install()
                 }
         }
         
-        $self->cleanup() unless $config->no_cleanup();
+        $self->cleanup() unless $config->{no_cleanup};
         
         $self->logdie($retval) if $retval = $image->prepare_boot();
 
