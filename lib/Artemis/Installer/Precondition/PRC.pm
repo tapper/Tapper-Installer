@@ -67,26 +67,19 @@ method create_config($prc)
 };
 
 
-=head2 install
+=head2 install_startscript
 
-Install the tools used to control running of programs on the test
-system. This function is implemented to fullfill the needs of kernel
-testing and is likely to change dramatically in the future due to
-limited extensibility. Furthermore, it has the name of the PRC hard
-coded which isn't a good thing either.
-
-@param hash ref - contains all information about the PRC to install
+Install a startscript for init in test state.
 
 @return success - 0
-@return error   - return value of system or error string
+@return error   - error string
 
 =cut
 
-method install($prc)
+sub install_startscript
 {
-
+        my ($self, $distro) = @_;
         my $basedir = $self->cfg->{paths}{base_dir};
-        my $distro=$self->get_distro($basedir);
         my ($error, $retval);
         if (not -d "$basedir/etc/init.d" ) {
                 mkdir("$basedir/etc/init.d") or return "Can't create /etc/init.d/ in $basedir";
@@ -131,6 +124,32 @@ method install($prc)
                         }
                 }
         }
+}
+
+
+=head2 install
+
+Install the tools used to control running of programs on the test
+system. This function is implemented to fullfill the needs of kernel
+testing and is likely to change dramatically in the future due to
+limited extensibility. Furthermore, it has the name of the PRC hard
+coded which isn't a good thing either.
+
+@param hash ref - contains all information about the PRC to install
+
+@return success - 0
+@return error   - return value of system or error string
+
+=cut
+
+method install($prc)
+{
+
+        my $basedir = $self->cfg->{paths}{base_dir};
+        my ($error, $retval);
+        my $distro = $self->get_distro($basedir);
+        $retval    = $self->install_startscript($distro) if $distro and not $distro eq 'Debian';
+        return $retval if $retval;
 
         my $config;
         ($error, $config) = $self->create_config($prc);
@@ -173,6 +192,15 @@ method get_distro($dir)
 		return "gentoo"  if $file  =~ /gentoo/i;
 		return "artemis" if $file  =~ /artemis/i;
 	}
+        {
+                open my $fh, '<','/etc/issue' or next;
+                local $\='';
+                my $issue = <$fh>;
+                close $fh;
+                my $distro;
+                ($distro) = $issue =~ m/(Debian)/;
+                return $distro if $distro;
+        }
 	return "";
 };
 
