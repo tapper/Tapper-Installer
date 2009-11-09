@@ -38,7 +38,7 @@ method install($img)
 {
         return "not filename given for rawimage" if not $img->{name};
 
-        my $img_size = 500*1024; # 500MByte - size of standard rawimage in kbyte 
+        my $img_size = 2048*1024; # 2GByte - size of standard rawimage in kbyte 
 
         my $filename = $img->{name};
         my $path     = $self->cfg->{paths}{base_dir}.$img->{path};
