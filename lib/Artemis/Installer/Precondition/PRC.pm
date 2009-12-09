@@ -61,6 +61,7 @@ method create_config($prc)
         $config->{hostname}        = $self->{cfg}->{hostname};  # allows guest systems to know their host system name
         $config->{test_run}        = $self->{cfg}->{test_run};
         $config->{port}            = $self->{cfg}->{mcp_port} if $self->{cfg}->{mcp_port};
+        $config->{sync_port}       = $self->{cfg}->{sync_port} if $self->{cfg}->{sync_port};
         $config->{prc_nfs_server}  = $self->{cfg}->{prc_nfs_server} if $self->{cfg}->{prc_nfs_server}; # prc_nfs_path is set by merging paths above
         $config->{scenario_id}     = $self->{cfg}->{scenario_id} if $self->{cfg}->{scenario_id};
 
