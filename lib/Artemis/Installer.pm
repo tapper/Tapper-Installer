@@ -10,7 +10,7 @@ use YAML::Syck;
 
 with 'MooseX::Log::Log4perl';
 
-our $VERSION = '2.000060';
+our $VERSION = '2.000061';
 
 =head1 NAME
 
