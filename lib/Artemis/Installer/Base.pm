@@ -30,6 +30,15 @@ Artemis::Installer::Base - Install everything needed for a test.
 
 =cut
 
+=head2 cleanup
+
+Clean a set of predefine file by deleting all of their content. This prevents
+confusion in certain test suites which could occur when they find old content
+in log files. Only warns on error.
+
+@return success - 0
+
+=cut 
 
 method cleanup()
 {
