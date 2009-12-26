@@ -18,4 +18,5 @@ t/artemis_schema_hardwaredb_test.sqlite
 artemis_testrundb_development.sqlite
 artemis_reportsdb_development.sqlite
 MANIFEST
+Makefile
 META.yml
