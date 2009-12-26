@@ -137,42 +137,48 @@ method system_install()
         foreach my $precondition (@{$config->{preconditions}}) {
                 if ($precondition->{precondition_type} eq 'image')
                 {
-                        $self->logdie($retval) if $retval = $self->precondition_install($precondition, $image);
+                        $retval = $self->precondition_install($precondition, $image);
                 }
                 elsif ($precondition->{precondition_type} eq 'package')
                 {
                         my $package=Artemis::Installer::Precondition::Package->new($config);
-                        $self->logdie($retval) if $retval = $self->precondition_install($precondition, $package);
+                        $retval = $self->precondition_install($precondition, $package);
                 }
                 elsif ($precondition->{precondition_type} eq 'copyfile')
                 {
                         my $copyfile = Artemis::Installer::Precondition::Copyfile->new($config);
-                        $self->logdie($retval) if $retval = $self->precondition_install($precondition, $copyfile);
+                        $retval = $self->precondition_install($precondition, $copyfile);
                 }
                 elsif ($precondition->{precondition_type} eq 'fstab')
                 {
                         my $fstab = Artemis::Installer::Precondition::Fstab->new($config);
-                        $self->logdie($retval) if $retval = $self->precondition_install($precondition, $fstab);
+                        $retval = $self->precondition_install($precondition, $fstab);
                 }
                 elsif ($precondition->{precondition_type} eq 'prc')
                 {
                         my $prc=Artemis::Installer::Precondition::PRC->new($config);
-                        $self->logdie($retval) if $retval = $self->precondition_install($precondition, $prc);
+                        $retval = $self->precondition_install($precondition, $prc);
                 }
                 elsif ($precondition->{precondition_type} eq 'rawimage')
                 {
                         my $rawimage=Artemis::Installer::Precondition::Rawimage->new($config);
-                        $self->logdie($retval) if $retval = $self->precondition_install($precondition, $rawimage);
+                        $retval = $self->precondition_install($precondition, $rawimage);
                 }
                 elsif ($precondition->{precondition_type} eq 'repository')
                 {
                         my $repository=Artemis::Installer::Precondition::Repository->new($config);
-                        $self->logdie($retval) if $retval = $self->precondition_install($precondition, $repository);
+                        $retval = $self->precondition_install($precondition, $repository);
                 }
                 elsif ($precondition->{precondition_type} eq 'exec')
                 {
                         my $exec=Artemis::Installer::Precondition::Exec->new($config);
-                        $self->logdie($retval) if $retval = $self->precondition_install($precondition, $exec);
+                        $retval = $self->precondition_install($precondition, $exec);
+                }
+
+                if ($precondition->{continue_on_error}) {
+                        $self->mcp_send({state => 'warn-install', error => $msg});
+                } else {
+                        $self->logdie($retval);
                 }
         }
         
