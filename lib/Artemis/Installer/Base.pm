@@ -175,10 +175,12 @@ method system_install()
                         $retval = $self->precondition_install($precondition, $exec);
                 }
 
-                if ($precondition->{continue_on_error}) {
-                        $self->mcp_send({state => 'warn-install', error => $msg});
-                } else {
-                        $self->logdie($retval);
+                if ($retval) {
+                        if ($precondition->{continue_on_error}) {
+                                $self->mcp_send({state => 'warn-install', error => $retval});
+                        } else {
+                                $self->logdie($retval);
+                        }
                 }
         }
         
