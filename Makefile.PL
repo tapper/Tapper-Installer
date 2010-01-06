@@ -38,11 +38,11 @@ auto_install;
 postamble("
 
 live:
-\t./script/dist_upload_wotan.sh dist
+\t./scripts/dist_upload_wotan.sh dist
 \t/data/bancroft/artemis/live/nfsroot/installation_base/opt/artemis/bin/cpan Artemis::Installer\"
 
 devel:
-\t./script/dist_upload_wotan.sh dist
+\t./scripts/dist_upload_wotan.sh dist
 \t/data/bancroft/artemis/development/nfsroot/installation_base/opt/artemis/bin/cpan Artemis::Installer\"
 ");
 
