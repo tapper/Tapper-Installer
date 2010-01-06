@@ -39,11 +39,11 @@ postamble("
 
 live:
 \t./scripts/dist_upload_wotan.sh dist
-\t/data/bancroft/artemis/live/nfsroot/installation_base/opt/artemis/bin/cpan Artemis::Installer\"
+\t/data/bancroft/artemis/live/nfsroot/installation_base/opt/artemis/bin/cpan Artemis::Installer
 
 devel:
 \t./scripts/dist_upload_wotan.sh dist
-\t/data/bancroft/artemis/development/nfsroot/installation_base/opt/artemis/bin/cpan Artemis::Installer\"
+\t/data/bancroft/artemis/development/nfsroot/installation_base/opt/artemis/bin/cpan Artemis::Installer
 ");
 
 WriteAll;
