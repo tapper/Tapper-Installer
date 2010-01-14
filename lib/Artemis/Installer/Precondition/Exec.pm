@@ -60,6 +60,8 @@ method install ($exec)
                 $ENV{ARTEMIS_REPORT_SERVER}   = $self->cfg->{report_server};
                 $ENV{ARTEMIS_REPORT_API_PORT} = $self->cfg->{report_api_port};
                 $ENV{ARTEMIS_REPORT_PORT}     = $self->cfg->{report_port};
+                $ENV{ARTEMIS_HOSTNAME}        = $self->cfg->{hostname};
+
                 close $read;
 		# chroot to execute script inside the future root file system
                 my ($error, $output)=$self->log_and_exec("mount -o bind /dev/ ".$self->cfg->{paths}{base_dir}."/dev");
