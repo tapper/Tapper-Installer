@@ -41,7 +41,7 @@ MOUNT=/opt/artemis/mnt
 MOUNT64:=\${MOUNT}64
 MOUNT32:=\${MOUNT}32
 PKG_DIR=/data/bancroft/artemis/live/repository/packages/artemisutils/
-PKG_DIR_DEV=/data/bancroft/artemis/devel/repository/packages/artemisutils/
+PKG_DIR_DEV=/data/bancroft/artemis/development/repository/packages/artemisutils/
 
 live:
 \t./scripts/dist_upload_wotan.sh dist
