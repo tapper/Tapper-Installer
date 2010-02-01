@@ -12,8 +12,8 @@ author_requires 'Module::Install::WriteAll';
 build_requires 'Test::More';
 build_requires 'Test::Fixture::DBIC::Schema';
 build_requires 'Test::MockModule';
-build_requires 'Test::More';
 build_requires 'Artemis::Test' => '2.010005';
+build_requires 'File::Temp';
 
 requires 'perl' => '5.010';
 requires 'File::Basename';
