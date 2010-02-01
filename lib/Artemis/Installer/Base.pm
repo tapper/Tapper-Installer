@@ -2,6 +2,7 @@ package Artemis::Installer::Base;
 
 use strict;
 use warnings;
+use 5.010;
 
 use Method::Signatures;
 use Moose;
@@ -38,7 +39,7 @@ in log files. Only warns on error.
 
 @return success - 0
 
-=cut 
+=cut
 
 method cleanup()
 {
@@ -75,20 +76,20 @@ method precondition_install($precondition, $inst_obj)
         if ($precondition->{mountpartition}) {
                 my $mountfile;
                 $mountfile = $precondition->{mountfile} if $precondition->{mountfile};
-                # $obj is given to the anonymous sub when the sub is called inside guest_install. 
+                # $obj is given to the anonymous sub when the sub is called inside guest_install.
                 # This is the way to get an appropriate object with correctly set base directory.
                 # $precondition on the other hand is set in here and the sub carries it to guest_install.
                 return $inst_obj->guest_install(sub{
-                                                        my ($obj) = @_; 
+                                                        my ($obj) = @_;
                                                         $obj->install($precondition);
                                                 },
                                                 $precondition->{mountpartition},
                                                 $mountfile);
-        } 
+        }
         # guest in given raw image file without partitions
         elsif ($precondition->{mountfile}) {
                 return $inst_obj->guest_install(sub{
-                                                        my ($obj) = @_; 
+                                                        my ($obj) = @_;
                                                         $obj->install($precondition);
                                                 },undef, $precondition->{mountfile});
         } else {
@@ -105,14 +106,17 @@ other system installer functions and calls them appropriately. Note that the
 function will not return in case of an error. Instead it throws an exception with
 should be send to the server by Log4perl.
 
+@param string - in what state are we called (autoinstall, other)
+
 =cut
 
-method system_install()
+method system_install($state)
 {
         my $retval;
+        $state //= '';  # always defined value for state
         # fetch configurations from the server
         my $consumer = Artemis::Installer::Config->new;
-        
+
         # try to get host for error reporting as soon as possible
         my $host = $consumer->get_artemis_host();
         $self->cfg->{mcp_server}=$host if $host;
@@ -125,15 +129,18 @@ method system_install()
 
         # Just mount everything in the fstab. This isn't perfect but enough for now.
         system("mount","-a");
-        
+
         $self->log->info("Starting installation of test machine");
-        $self->mcp_inform("start-install");
+        $self->mcp_inform("start-install") unless $state eq "autoinstall";
+
 
         my $image=Artemis::Installer::Precondition::Image->new($config);
-        $self->logdie("First precondition is not the root image") 
-          if not $config->{preconditions}->[0]->{precondition_type} eq 'image' 
-            and $config->{preconditions}->[0]->{mount} eq '/';
-        
+        if (not $state eq "autoinstall") {
+                $self->logdie("First precondition is not the root image")
+                  if not $config->{preconditions}->[0]->{precondition_type} eq 'image'
+                    and $config->{preconditions}->[0]->{mount} eq '/';
+        }
+
         foreach my $precondition (@{$config->{preconditions}}) {
                 if ($precondition->{precondition_type} eq 'image')
                 {
@@ -183,15 +190,17 @@ method system_install()
                         }
                 }
         }
-        
+
         $self->cleanup() unless $config->{no_cleanup};
-        
-        $self->logdie($retval) if $retval = $image->prepare_boot();
+
+        if (not $config->{skip_prepare_boot}) {
+                $self->logdie($retval) if $retval = $image->prepare_boot();
+        }
 
         $self->mcp_inform("end-install");
         $self->log->info("Finished installation of test machine");
 
-        system("reboot") if not $config->{installer_stop};
+        system("reboot") unless $config->{installer_stop} or $state eq "autoinstall";
         return 0;
 };
 
