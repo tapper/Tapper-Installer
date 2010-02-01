@@ -14,7 +14,6 @@ build_requires 'Test::Fixture::DBIC::Schema';
 build_requires 'Test::MockModule';
 build_requires 'Test::More';
 build_requires 'Artemis::Test' => '2.010005';
-build_requires 'Artemis::Config' => '2.010053';
 
 requires 'perl' => '5.010';
 requires 'File::Basename';
