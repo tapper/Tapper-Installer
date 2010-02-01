@@ -5,8 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::MockModule;
-use Artemis::Config;
-
+use File::Temp qw/tempdir/;
 
 BEGIN { use_ok('Artemis::Installer::Precondition');
         use_ok('Artemis::Installer::Precondition::Image');
@@ -38,8 +37,8 @@ is ($inst_base->get_file_type('t/file_type/targzfile'), 'gzip', 'Detected tar.gz
 is ($inst_base->get_file_type('t/file_type/tarbz2file'), 'bz2', 'Detected bzip using file type.');
 is ($inst_base->get_file_type('t/file_type/tarfile'), 'tar', 'Detected tar using file.');
 
-
-my $config     = Artemis::Config::subconfig();
+my $grub_dir   = tempdir( CLEANUP => 1 );
+my $config     = {paths => {grubpath => $grub_dir}};
 my $inst_image = Artemis::Installer::Precondition::Image->new($config);
 my $retval     = $inst_image->generate_pxe_grub();
 is ($retval, 0, 'Generating PXE grub config'); 
