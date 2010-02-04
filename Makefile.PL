@@ -45,7 +45,6 @@ PKG_DIR_DEV=/data/bancroft/artemis/development/repository/packages/artemisutils/
 
 live:
 \t./scripts/dist_upload_wotan.sh dist
-\t/data/bancroft/artemis/live/nfsroot/installation_base/opt/artemis/bin/cpan Artemis::Installer
 
 devel:
 \t./scripts/dist_upload_wotan.sh dist
@@ -57,7 +56,6 @@ devel:
 \tssh artemis\@bancroft \"cd \${MOUNT32}; sudo chroot \${MOUNT64} /opt/artemis/bin/cpan Artemis::Installer && tar -czf \${PKG_DIR_DEV}/opt-artemis32_devel.tar.gz opt/\"
 \tssh artemis\@bancroft \"sudo mv \${MOUNT32}/opt \${MOUNT32}/opt.devel; sudo mv \${MOUNT32}/opt.live \${MOUNT32}/opt;\"
 
-\t/data/bancroft/artemis/development/nfsroot/installation_base/opt/artemis/bin/cpan Artemis::Installer
 ");
 
 WriteAll;
