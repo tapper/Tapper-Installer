@@ -115,6 +115,8 @@ method install_nfs($file)
                 $path .= '/' if $path !~ m,/$,;
         }
 
+        $self->make_dir($nfs_dir) if not -d $nfs_dir;
+        
         $self->log->debug("mount -a $path $nfs_dir");
 
         ($error, $retval) = $self->log_and_exec("mount $path $nfs_dir");
