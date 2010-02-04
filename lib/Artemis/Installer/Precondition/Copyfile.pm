@@ -106,6 +106,7 @@ Install a file from an nfs share.
 method install_nfs($file)
 {
 	my ($filename, $path, $retval, $error);
+        my $nfs_dir='/mnt/nfs';
 
         if ( $file->{name} =~ m,/$, ) {
                 return 'File name is a directory. Installing directory preconditions is not yet supported';
@@ -114,15 +115,15 @@ method install_nfs($file)
                 $path .= '/' if $path !~ m,/$,;
         }
 
-        $self->log->debug("mount -a $path /mnt/nfs");
+        $self->log->debug("mount -a $path $nfs_dir");
 
-        ($error, $retval) = $self->log_and_exec("mount $path /mnt/nfs");
-        return ("Can't mount nfs share $path to /mnt/nfs: $retval") if $error;
-        $file->{name} = "/mnt/nfs/$filename";
+        ($error, $retval) = $self->log_and_exec("mount $path $nfs_dir");
+        return ("Can't mount nfs share $path to $nfs_dir: $retval") if $error;
+        $file->{name} = "$nfs_dir/$filename";
         $retval =  $self->install_local($file);
 
 
-        $self->log_and_exec("umount /mnt/nfs");
+        $self->log_and_exec("umount $nfs_dir");
         return $retval;
 };
 
