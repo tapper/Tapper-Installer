@@ -193,7 +193,8 @@ method system_install($state)
 
         $self->cleanup() unless $config->{no_cleanup};
 
-        if (not $config->{skip_prepare_boot}) {
+        if (not ($config->{skip_prepare_boot}
+                 or ($state and $state eq "autoinstall"))) {
                 $self->logdie($retval) if $retval = $image->prepare_boot();
         }
 
