@@ -6,10 +6,10 @@ $EXECDIR/artemis_version_increment.pl $EXECDIR/../lib/Artemis/Installer.pm
 cd $EXECDIR/..
 
 rm MANIFEST
-./Build manifest || exit -1
+make manifest || exit -1
 
-perl Build.PL || exit -1
-./Build dist || exit -1
+perl Makefile.PL || exit -1
+make dist || exit -1
 
 # -----------------------------------------------------------------
 # It is important to not overwrite existing files.
