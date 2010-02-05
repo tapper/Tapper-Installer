@@ -62,6 +62,7 @@ method install($img)
         ($error, $retval) = $self->log_and_exec("/sbin/mkfs.ext3 -F -L artemis $filename");
         return $retval if $error;
         
+        $self->make_dir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
         ($error, $retval) = $self->log_and_exec("mount -o loop $filename ".$self->cfg->{paths}{guest_mount_dir});
         return $retval if $error;
         my $mountdir = $self->cfg->{paths}{guest_mount_dir};
