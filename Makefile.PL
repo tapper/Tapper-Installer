@@ -15,7 +15,6 @@ build_requires 'Test::MockModule';
 build_requires 'Artemis::Test' => '2.010005';
 build_requires 'File::Temp';
 
-requires 'perl' => '5.010';
 requires 'File::Basename';
 requires 'File::Path';
 requires 'File::Type';
