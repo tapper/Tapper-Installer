@@ -6,7 +6,6 @@ use warnings;
 use File::Basename;
 use Hash::Merge::Simple 'merge';
 use File::ShareDir      'module_file';
-use Method::Signatures;
 use Moose;
 use YAML;
 extends 'Artemis::Installer::Precondition';
@@ -38,8 +37,9 @@ messages from all virtualisation guests.
 
 =cut
 
-method create_config($prc)
+sub create_config
 {
+        my ($self, $prc) = @_;
         my $config = merge($prc->{config}, {paths=>$self->{cfg}->{paths}});
         $config    = merge($config, {times=>$self->{cfg}->{times}});
         my @timeouts;
@@ -66,7 +66,7 @@ method create_config($prc)
         $config->{scenario_id}     = $self->{cfg}->{scenario_id} if $self->{cfg}->{scenario_id};
 
         return (0, $config);
-};
+}
 
 
 =head2 install_startscript
@@ -163,8 +163,9 @@ coded which isn't a good thing either.
 
 =cut
 
-method install($prc)
+sub install
 {
+        my ($self, $prc) = @_;
 
         my $basedir = $self->cfg->{paths}{base_dir};
         my ($error, $retval);
@@ -190,7 +191,7 @@ method install($prc)
 
         return 0;
 }
-;
+
 
 
 =head2 get_distro
@@ -206,8 +207,9 @@ distribution
 
 =cut
 
-method get_distro($dir)
+sub get_distro
 {
+        my ($self, $dir) = @_;
 	my @files=glob("$dir/etc/*-release");
 	for my $file(@files){
 		return "suse"    if $file  =~ /suse/i;
@@ -225,7 +227,7 @@ method get_distro($dir)
                 return $distro if $distro;
         }
 	return "";
-};
+}
 
 
 1;
