@@ -218,7 +218,7 @@ sub get_distro
 		return "artemis" if $file  =~ /artemis/i;
 	}
         {
-                open my $fh, '<','/etc/issue' or next;
+                open my $fh, '<',"$dir/etc/issue" or next;
                 local $\='';
                 my $issue = <$fh>;
                 close $fh;
