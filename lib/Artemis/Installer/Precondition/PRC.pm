@@ -128,6 +128,25 @@ sub install_startscript
         }
 }
 
+=head2 create_win_config
+
+Create the config for a windows guest running the special Win-PRC. Win-PRC
+expects a flat YAML with some different keys and does not want any waste
+options. 
+
+@param hash reference - contains all information about the PRC to install
+
+@return success - (0, config hash)
+@return error   - (1, error string)
+
+=cut
+
+sub create_win_config
+{
+        my ($self, $prc) = @_;
+        
+}
+
 
 =head2 install
 
@@ -160,6 +179,8 @@ method install($prc)
         open FILE, '>',$basedir.'/etc/artemis' or return "Can not open /etc/artemis in $basedir:$!";
         print FILE YAML::Dump($config);
         close FILE;
+
+
         
         if ($prc->{artemis_package}) {
                 my $pkg_object=Artemis::Installer::Precondition::Package->new($self->cfg);
