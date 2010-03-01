@@ -28,6 +28,7 @@ or $device name (with or without preceding /dev/).
 Doesn't work with dev-mapper.
 
 @param string - device or reference to array with device ids
+@param string - base dir prepended to all paths (testing purpose) 
 
 @returnlist success - ( 0, device name string)
 @returnlist error   - ( 1, error string)
@@ -36,7 +37,8 @@ Doesn't work with dev-mapper.
 
 sub get_device
 {
-        my ($self, $devices) = @_;
+        my ($self, $devices, $basedir) = @_;
+        $basedir ||= '/';           # basedir is only supposed for unit testing
         my @device_alternatives;
         if (ref($devices) eq 'ARRAY') {
                 @device_alternatives = @$devices;
@@ -47,21 +49,22 @@ sub get_device
         my $dev_symlink;
  ALTERNATIVE:
         foreach my $device_id (@device_alternatives) {
-                if (-e "/dev/disk/by-label/".$device_id) {
-                        $dev_symlink=readlink("/dev/disk/by-label/$device_id");
+                if (-e "$basedir/dev/disk/by-label/".$device_id) {
+                        $dev_symlink=readlink("$basedir/dev/disk/by-label/$device_id");
                         last ALTERNATIVE;
-                } elsif (-e "/dev/disk/by-uuid/".$device_id) {
-                        $dev_symlink = readlink("/dev/disk/by-uuid/$device_id");
+                } elsif (-e "$basedir/dev/disk/by-uuid/".$device_id) {
+                        $dev_symlink = readlink("$basedir/dev/disk/by-uuid/$device_id");
                         last ALTERNATIVE;
-                } elsif (-e "/dev/".$device_id or -e $device_id) {
+                } elsif (-e "$basedir/dev/".$device_id or -e "$basedir/$device_id") {
                         $dev_symlink = $device_id;
                         last ALTERNATIVE;
                 }
+
         }
         my $error_string = "No device named ";
         $error_string   .= join ", ", @device_alternatives;
         $error_string   .= " could be found";
-        return(1, $error_string);
+        return(1, $error_string) if not $dev_symlink;
 
         my @linkpath=split("/", $dev_symlink); # split link to avoid /dev/disk/by-xyz/../../hda1, is way faster than regexp
         my $partition = $linkpath[-1];
