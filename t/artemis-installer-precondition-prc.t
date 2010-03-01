@@ -11,10 +11,11 @@ BEGIN {
         use_ok('Artemis::Installer::Precondition::PRC');
  }
 
-
+my $tempdir = tempdir( CLEANUP => 1 );
+mkdir("$tempdir/etc/") or die "Can't create $tempdir/etc/:$!";
 
 my $config = {paths => 
-              {base_dir => tempdir( CLEANUP => 1 ) }
+              {base_dir => $tempdir }
              };
 
 my $prc_installer = Artemis::Installer::Precondition::PRC->new($config);
@@ -28,6 +29,9 @@ is($retval, "Debian", 'Detect Debian distribution');
 $retval = $prc_installer->get_distro("");
 is($retval, "", 'Detect unknown distribution');
 
-$retval = $prc_installer->create_config();
+$retval = $prc_installer->install();
+
+ok(-e "$tempdir/etc/artemis",'Write config file for PRC'); 
+ok(-e "$tempdir/test.config",'Write config file for WinPRC'); 
 
 done_testing();
