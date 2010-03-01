@@ -21,6 +21,55 @@ Artemis::Installer::Precondition::Package - Install a package to a given locatio
 =cut
 
 
+=head2 get_device
+
+Return device name (i.e. /dev/$device) for a given device-id, partition label
+or $device name (with or without preceding /dev/).
+Doesn't work with dev-mapper.
+
+@param string - device or reference to array with device ids
+
+@returnlist success - ( 0, device name string)
+@returnlist error   - ( 1, error string)
+
+=cut
+
+sub get_device
+{
+        my ($self, $devices) = @_;
+        my @device_alternatives;
+        if (ref($devices) eq 'ARRAY') {
+                @device_alternatives = @$devices;
+        } else {
+                @device_alternatives = ($devices);
+        }
+
+        my $dev_symlink;
+ ALTERNATIVE:
+        foreach my $device_id (@device_alternatives) {
+                if (-e "/dev/disk/by-label/".$device_id) {
+                        $dev_symlink=readlink("/dev/disk/by-label/$device_id");
+                        last ALTERNATIVE;
+                } elsif (-e "/dev/disk/by-uuid/".$device_id) {
+                        $dev_symlink = readlink("/dev/disk/by-uuid/$device_id");
+                        last ALTERNATIVE;
+                } elsif (-e "/dev/".$device_id or -e $device_id) {
+                        $dev_symlink = $device_id;
+                        last ALTERNATIVE;
+                }
+        }
+        my $error_string = "No device named ";
+        $error_string   .= join ", ", @device_alternatives;
+        $error_string   .= " could be found";
+        return(1, $error_string);
+
+        my @linkpath=split("/", $dev_symlink); # split link to avoid /dev/disk/by-xyz/../../hda1, is way faster than regexp
+        my $partition = $linkpath[-1];
+        return (0,"/dev/$partition");
+}
+
+
+
 =head2 get_partition_label
 
 Get the label of a partition to be able to set it again at mkfs.
