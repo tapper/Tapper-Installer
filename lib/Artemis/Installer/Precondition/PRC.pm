@@ -181,6 +181,13 @@ sub install
         print FILE YAML::Dump($config);
         close FILE;
 
+        ($error, $config) = $self->create_win_config($prc);
+        return $config if $error;
+
+        open FILE, '>',$basedir.'/test.config' or return "Can not open /test.config in $basedir:$!";
+        print FILE YAML::Dump($config);
+        close FILE;
+
 
         
         if ($prc->{artemis_package}) {
