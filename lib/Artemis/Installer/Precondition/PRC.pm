@@ -143,6 +143,51 @@ sub install_startscript
         }
 }
 
+=head2 create_win_config
+
+Create the config for a windows guest running the special Win-PRC. Win-PRC
+expects a flat YAML with some different keys and does not want any waste
+options. 
+
+@param hash reference - contains all information about the PRC to install
+
+@return success - (0, config hash)
+@return error   - (1, error string)
+
+=cut
+
+sub create_win_config
+{
+        my ($self, $prc) = @_;
+        my $config = $self->create_common_config();
+        $config->{guest_number} = $prc->{config}->{guest_number} if $prc->{config}->{guest_number};
+
+        if ($prc->{config}->{guest_count})
+        {
+                $config->{guest_count} = $prc->{config}->{guest_count};
+        }
+        if ($prc->{config}->{testprogram_list}) {
+                for (my $i=0; $i< int @{$prc->{config}->{testprogram_list}}; $i++) {
+                        # string concatenation for hash keys, otherwise perl can't tell whether
+                        # $i ot $i_prog is the name of the variable
+                        $config->{"test".$i."_prog"}            = 
+                          $prc->{config}->{testprogram_list}->[$i]->{test_program};
+                        $config->{"test".$i."_runtime_default"} = 
+                          $prc->{config}->{testprogram_list}->[$i]->{runtime};
+                        $config->{"test".$i."_timeout"}         = 
+                          $prc->{config}->{testprogram_list}->[$i]->{timeout_testprogram};
+                }
+        } elsif ($prc->{config}->{test_program}) {
+                $config->{test0_prog}            = $prc->{config}->{test_program};
+                $config->{test0_runtime_default} = $prc->{config}->{runtime};
+                $config->{test0_timeout}         = $prc->{config}->{timeout_testprogram}
+
+        }
+        
+        return (0, $config);
+        
+}
+
 
 =head2 install
 
