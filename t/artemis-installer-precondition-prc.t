@@ -12,7 +12,6 @@ BEGIN {
  }
 
 my $tempdir = tempdir( CLEANUP => 1 );
-mkdir("$tempdir/etc/") or die "Can't create $tempdir/etc/:$!";
 
 my $config = {paths =>
               { base_dir => $tempdir },
