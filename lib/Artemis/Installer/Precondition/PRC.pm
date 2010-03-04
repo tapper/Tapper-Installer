@@ -218,7 +218,9 @@ sub install
         ($error, $config) = $self->create_config($prc);
         return $config if $error;
 
-        open FILE, '>',$basedir.'/etc/artemis' or return "Can not open /etc/artemis in $basedir:$!";
+        $self->make_dir("$basedir/etc") if not -d "$basedir/etc";
+
+        open FILE, '>',"$basedir/etc/artemis" or return "Can not open /etc/artemis in $basedir:$!";
         print FILE YAML::Dump($config);
         close FILE;
 
