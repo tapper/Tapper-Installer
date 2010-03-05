@@ -50,13 +50,13 @@ method install ($package)
         my $output;
         $self->log->debug("type is $type");
         if ($type eq "gzip") {
-                ($error, $output) = $self->log_and_exec("tar -C $basedir -xzf $pkg");
+                ($error, $output) = $self->log_and_exec("tar --no-same-owner -C $basedir -xzf $pkg");
                 return("can't unpack package $filename: $output\n") if $error;
         } elsif ($type eq "tar") {
-                ($error, $output) = $self->log_and_exec("tar -C $basedir -xf $pkg");
+                ($error, $output) = $self->log_and_exec("tar --no-same-owner -C $basedir -xf $pkg");
                 return("can't unpack package $filename: $output\n") if $error;
         } elsif ($type eq "bz2") {
-                ($error, $output) = $self->log_and_exec("tar -C $basedir -xjf $pkg");
+                ($error, $output) = $self->log_and_exec("tar --no-same-owner -C $basedir -xjf $pkg");
                 return("can't unpack package $filename: $output\n") if $error;
         } elsif ($type eq "deb") {
                 ($error, $output) = $self->log_and_exec("dpkg --root $basedir -i $pkg");
