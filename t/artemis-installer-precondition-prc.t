@@ -102,5 +102,7 @@ is_deeply($retval, {guest_number => 1,
                     test2_prog =>  "none"
                    }, 'Generate config for WinSST');
 
+($success, $retval) = $prc_installer->create_config($prc);
+is($retval->{testrun}, $config->{testrun}, 'Create config');
 
 done_testing();
