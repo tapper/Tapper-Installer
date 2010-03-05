@@ -33,8 +33,7 @@ Create the part of the config that is the same for both Windows and Unix.
 
 sub create_common_config
 {
-        my ($self) = @_;
-        my $config;
+        my ($self, $config) = @_;
         $config->{report_server}   = $self->{cfg}->{report_server};
         $config->{report_port}     = $self->{cfg}->{report_port};
         $config->{report_api_port} = $self->{cfg}->{report_api_port};
@@ -64,8 +63,8 @@ messages from all virtualisation guests.
 sub create_config
 {
         my ($self, $prc) = @_;
-        my $config = $self->create_common_config();
-        $config = merge($prc->{config}, {paths=>$self->{cfg}->{paths}});
+        my $config = merge($prc->{config}, {paths=>$self->{cfg}->{paths}});
+        $config    = $self->create_common_config($config);
         $config    = merge($config, {times=>$self->{cfg}->{times}});
         my @timeouts;
 
