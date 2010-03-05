@@ -11,7 +11,7 @@ BEGIN {
 
 
 my $client = new Artemis::Installer::Base;
-$client->system_install();
+$client->system_install("");
 
 
 =pod
