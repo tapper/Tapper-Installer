@@ -20,7 +20,7 @@ my $config = {paths =>
 my $image_installer = Artemis::Installer::Precondition::Image->new($config);
 
 SKIP:{
-        skip "Can not test get_device since make dist kills symlinks", 3 unless $ENV{ARTEMIS_DEVELOPMENT}=1
+        skip "Can not test get_device since make dist kills symlinks", 3 unless $ENV{ARTEMIS_DO_TESTING}=1
         my $retval = $image_installer->get_device('/dev/hda2','t/misc/');
         is($retval, "/dev/hda2", "Find device from single file without links");
         
