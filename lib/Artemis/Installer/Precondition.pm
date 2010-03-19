@@ -194,6 +194,7 @@ method guest_install($sub, $partition, $image)
         if ($image and $partition) {
                 # make sure loop device is free
                 $self->log_and_exec("losetup -d /dev/loop0"); # ignore error since most of the time device won't be already bound
+                $self->make_dir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
                 return $retval if $retval = $self->log_and_exec("losetup /dev/loop0 $image");
                 return $retval if $retval = $self->log_and_exec("kpartx -a /dev/loop0");
                 return $retval if $retval = $self->log_and_exec("mount /dev/mapper/loop0$partition ".$self->cfg->{paths}{guest_mount_dir});
