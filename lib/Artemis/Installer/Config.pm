@@ -47,7 +47,14 @@ method get_artemis_host()
         my $cmd_line = <FH>;
         close FH;
         ($host,undef,$port) = $cmd_line =~ m/artemis_host\s*=\s*(\w+)(:(\d+))?/;
-        return($host,$port);
+        return($host,$port) if $host;
+
+        # try %ENV
+        if ($ENV{ARTEMIS_MCP_SERVER}) {
+                $host = $ENV{ARTEMIS_MCP_SERVER};
+                $port = $ENV{ARTEMIS_MCP_PORT};
+                return ($host, $port);
+        }
 
         # try multicast
 };
