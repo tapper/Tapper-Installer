@@ -6,6 +6,7 @@ author   'OSRC SysInt Team <osrc-sysint@elbe.amd.com>';
 license  'perl';
 
 install_script 'bin/artemis-installer-client.pl';
+install_script 'bin/artemis-installer-simnow.pl';
 
 author_requires 'Module::Install::WriteAll';
 
