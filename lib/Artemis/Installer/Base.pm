@@ -7,7 +7,7 @@ use 5.010;
 use Method::Signatures;
 use Moose;
 
-use Artemis::Installer::Config;
+use Artemis::Remote::Config;
 use Artemis::Installer::Precondition::Image;
 use Artemis::Installer::Precondition::Package;
 use Artemis::Installer::Precondition::Copyfile;
@@ -115,7 +115,7 @@ method system_install($state)
         my $retval;
         $state //= '';  # always defined value for state
         # fetch configurations from the server
-        my $consumer = Artemis::Installer::Config->new;
+        my $consumer = Artemis::Remote::Config->new;
 
         # try to get host for error reporting as soon as possible
         my $host = $consumer->get_artemis_host();
