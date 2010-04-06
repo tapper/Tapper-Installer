@@ -34,7 +34,7 @@ is($retval, "suse", 'Detect SuSE distribution');
 $retval = $prc_installer->get_distro('t/misc/files/Debian');
 is($retval, "Debian", 'Detect Debian distribution');
 
-$retval = $prc_installer->get_distro("");
+$retval = $prc_installer->get_distro("t/");
 is($retval, "", 'Detect unknown distribution');
 
 $retval = $prc_installer->install();
