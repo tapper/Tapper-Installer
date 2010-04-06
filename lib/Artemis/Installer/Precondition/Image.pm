@@ -140,7 +140,7 @@ method generate_pxe_grub()
             "terminal serial\n",
               "timeout 2\n\n",
                 "title Boot from first hard disc\n",
-                  "chainloader (hd0)+1";
+                  "chainloader (hd0,1)+1";
         close $fh or return "Closing PXE grub file $filename of NFS failed: $!";
         return 0;
 };
