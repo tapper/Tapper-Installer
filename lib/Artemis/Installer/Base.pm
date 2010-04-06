@@ -113,7 +113,7 @@ should be send to the server by Log4perl.
 method system_install($state)
 {
         my $retval;
-        $state //= '';  # always defined value for state
+        $state //= 'standard';  # always defined value for state
         # fetch configurations from the server
         my $consumer = Artemis::Remote::Config->new;
 
@@ -135,7 +135,7 @@ method system_install($state)
 
 
         my $image=Artemis::Installer::Precondition::Image->new($config);
-        if (not $state eq "autoinstall") {
+        if ($state eq "standard") {
                 $self->logdie("First precondition is not the root image")
                   if not $config->{preconditions}->[0]->{precondition_type} eq 'image'
                     and $config->{preconditions}->[0]->{mount} eq '/';
@@ -201,7 +201,7 @@ method system_install($state)
         $self->mcp_inform("end-install");
         $self->log->info("Finished installation of test machine");
 
-        system("reboot") unless $config->{installer_stop} or $state eq "autoinstall";
+        system("reboot") if $state eq "standard" and not $config->{installer_stop};
         return 0;
 };
 
