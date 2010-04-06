@@ -16,10 +16,11 @@ build_requires 'Test::MockModule';
 build_requires 'Artemis::Test' => '2.010005';
 build_requires 'File::Temp';
 
+
+requires 'Artemis::Remote';
 requires 'File::Basename';
 requires 'File::Path';
 requires 'File::Type';
-requires 'Getopt::Long';
 requires 'Hash::Merge::Simple';
 
 requires 'IPC::Open3';
@@ -27,10 +28,7 @@ requires 'List::Util';
 requires 'Log::Log4perl';
 requires 'Method::Signatures';
 requires 'Moose';
-requires 'Net::TFTP';
 
-requires 'Socket';
-requires 'Sys::Hostname';
 requires 'YAML';
 requires 'YAML::Syck';
 
