@@ -5,6 +5,7 @@ use warnings;
 
 use Hash::Merge::Simple 'merge';
 use File::Type;
+use File::Basename;
 use Method::Signatures;
 use Moose;
 use Socket;
@@ -189,15 +190,18 @@ method guest_install($sub, $partition, $image)
 {
         return "can only be called from an object" if not ref($self);
         $image = $self->cfg->{paths}{base_dir}.$image;
+        my ($error, $loop);
 
         my $retval;
         if ($image and $partition) {
                 # make sure loop device is free
-                $self->log_and_exec("losetup -d /dev/loop0"); # ignore error since most of the time device won't be already bound
+                ($error, $loop) = $self->log_and_exec("losetup --show -f");
+                return $loop if $error;
+                $loop = basename($loop);
                 $self->make_dir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
-                return $retval if $retval = $self->log_and_exec("losetup /dev/loop0 $image");
-                return $retval if $retval = $self->log_and_exec("kpartx -a /dev/loop0");
-                return $retval if $retval = $self->log_and_exec("mount /dev/mapper/loop0$partition ".$self->cfg->{paths}{guest_mount_dir});
+                return $retval if $retval = $self->log_and_exec("losetup /dev/$loop $image");
+                return $retval if $retval = $self->log_and_exec("kpartx -a /dev/$loop");
+                return $retval if $retval = $self->log_and_exec("mount /dev/mapper/$loop$partition ".$self->cfg->{paths}{guest_mount_dir});
         } 
         elsif ($image and not $partition) {
                 return $retval if $retval = $self->log_and_exec("mount -o loop $image ".$self->cfg->{paths}{guest_mount_dir});
@@ -215,9 +219,9 @@ method guest_install($sub, $partition, $image)
         return $retval if $retval=$sub->($object);
 
         if ($image and $partition) {
-                return $retval if $retval = $self->log_and_exec("umount /dev/mapper/loop0$partition");
-                return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
-                return $retval if $retval = $self->log_and_exec("losetup -d /dev/loop0");
+                return $retval if $retval = $self->log_and_exec("umount /dev/mapper/$loop$partition");
+                return $retval if $retval = $self->log_and_exec("kpartx -d /dev/$loop");
+                return $retval if $retval = $self->log_and_exec("losetup -d /dev/$loop");
         }
         elsif ($image and not $partition) {
                 return $retval if $retval = $self->log_and_exec("umount ".$self->cfg->{paths}{guest_mount_dir});
