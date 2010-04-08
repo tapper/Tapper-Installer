@@ -17,7 +17,7 @@ build_requires 'Artemis::Test' => '2.010005';
 build_requires 'File::Temp';
 
 
-requires 'Artemis::Remote';
+requires 'Artemis::Remote' => '1.000009';
 requires 'File::Basename';
 requires 'File::Path';
 requires 'File::Type';
@@ -43,6 +43,9 @@ PKG_DIR_DEV=/data/bancroft/artemis/development/repository/packages/artemisutils/
 
 live:
 \t./scripts/dist_upload_wotan.sh dist
+\tssh artemis\@bancroft \"cd \${MOUNT64}; sudo chroot \${MOUNT64} /opt/artemis/bin/cpan Artemis::Installer; tar -czf \${PKG_DIR}/opt-artemis64.tar.gz opt/ etc/resolv.conf\"
+\tssh artemis\@bancroft \"cd \${MOUNT32}; sudo chroot \${MOUNT32} /opt/artemis/bin/cpan Artemis::Installer; tar -czf \${PKG_DIR}/opt-artemis32.tar.gz opt/ etc/resolv.conf\"
+
 
 devel:
 \t./scripts/dist_upload_wotan.sh dist
