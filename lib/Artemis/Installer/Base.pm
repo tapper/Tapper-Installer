@@ -117,10 +117,6 @@ method system_install($state)
         # fetch configurations from the server
         my $consumer = Artemis::Remote::Config->new;
 
-        # try to get host for error reporting as soon as possible
-        my $host = $consumer->get_artemis_host();
-        $self->cfg->{mcp_server}=$host if $host;
-
         my $config=$consumer->get_local_data('install');
         $self->logdie($config) if not ref($config) eq 'HASH';
 
@@ -128,7 +124,7 @@ method system_install($state)
         $self->logdie("can't get local data: $config") if ref $config ne "HASH";
 
         # Just mount everything in the fstab. This isn't perfect but enough for now.
-        system("mount","-a");
+        system("mount","-a") unless $state eq "simnow";
 
         $self->log->info("Starting installation of test machine");
         $self->mcp_inform("start-install") unless $state eq "autoinstall";
@@ -193,8 +189,7 @@ method system_install($state)
 
         $self->cleanup() unless $config->{no_cleanup};
 
-        if (not ($config->{skip_prepare_boot}
-                 or ($state and $state eq "autoinstall"))) {
+        if ( $state eq "standard" and  not ($config->{skip_prepare_boot})) {
                 $self->logdie($retval) if $retval = $image->prepare_boot();
         }
 
