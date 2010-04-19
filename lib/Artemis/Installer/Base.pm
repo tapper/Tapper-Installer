@@ -196,7 +196,16 @@ method system_install($state)
         $self->mcp_inform("end-install");
         $self->log->info("Finished installation of test machine");
 
-        system("reboot") if $state eq "standard" and not $config->{installer_stop};
+        given ($state){
+                when ("standard"){
+                        return 0 if $config->{installer_stop};
+                        system("reboot");
+                }
+                when ('simnow'){
+                        #FIXME: don't use hardcoded path
+                        system("/opt/artemis/bin/perl","/opt/artemis/bin/artemis-simnow-start");
+                }
+        }
         return 0;
 };
 
