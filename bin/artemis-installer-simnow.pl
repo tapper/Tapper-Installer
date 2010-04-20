@@ -9,9 +9,13 @@ BEGIN {
 	Log::Log4perl::init('/etc/log4perl.cfg');
 }
 
+my $pid = fork();
+die "Can not fork:$!" if not defined $pid;
 
-my $client = new Artemis::Installer::Base;
-$client->system_install("simnow");
+if ($pid == 0) {
+        my $client = new Artemis::Installer::Base;
+        $client->system_install("simnow");
+}
 
 
 =pod
