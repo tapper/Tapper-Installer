@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Deep;
 use Test::MockModule;
 use File::Temp qw/tempdir/;
 
@@ -110,6 +111,6 @@ is_deeply($retval, {guest_number => 1,
                    }, 'Generate config for WinSST');
 
 ($success, $retval) = $prc_installer->create_config($prc);
-is($retval->{testrun}, $config->{testrun}, 'Create config');
+cmp_deeply($retval, superhashof($config), 'Create config');
 
 done_testing();
