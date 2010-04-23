@@ -49,7 +49,12 @@ my $prc = {config =>
             test_program => "winsst",
             timeout_testprogram => 60}};
 ($success, $retval) = $prc_installer->create_win_config($prc);
+
+use Data::Dumper;
+
 is_deeply($retval, {guest_number => 1,
+                    paths =>
+                    { base_dir => $tempdir },
                     hostname =>  "uruk",
                     mcp_port =>  12345,
                     mcp_server =>  "kupfer",
@@ -83,6 +88,8 @@ is_deeply($retval, {guest_number => 1,
 ($success, $retval) = $prc_installer->create_win_config($prc);
 is_deeply($retval, {guest_number => 1,
                     hostname =>  "uruk",
+                    paths =>
+                    { base_dir => $tempdir },
                     mcp_port =>  12345,
                     mcp_server =>  "kupfer",
                     prc_nfs_server =>  "kupfer",
