@@ -44,6 +44,8 @@ sub create_common_config
         $config->{sync_port}       = $self->{cfg}->{sync_port} if $self->{cfg}->{sync_port};
         $config->{prc_nfs_server}  = $self->{cfg}->{prc_nfs_server} if $self->{cfg}->{prc_nfs_server}; # prc_nfs_path is set by merging paths above
         $config->{scenario_id}     = $self->{cfg}->{scenario_id} if $self->{cfg}->{scenario_id};
+        $config->{paths}           = $self->{cfg}->{paths};
+        $config->{files}           = $self->{cfg}->{files} if $self->{cfg}->{files} ;
         return $config;
 }
 
@@ -63,8 +65,7 @@ messages from all virtualisation guests.
 sub create_config
 {
         my ($self, $prc) = @_;
-        my $config = merge($prc->{config}, {paths=>$self->{cfg}->{paths}});
-        $config    = $self->create_common_config($config);
+        my $config = $self->create_common_config($prc->{config});
         $config    = merge($config, {times=>$self->{cfg}->{times}});
         my @timeouts;
 
