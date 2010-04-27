@@ -83,7 +83,7 @@ method install_local($file) {
                 ($dest_filename, $dest_path, undef) = fileparse($file->{dest});
                 $dest_path .= '/' if $dest_path !~ m(/$);
         }
-        return $retval if $retval = $self->make_dir($dest_path);
+        return $retval if $retval = $self->makedir($dest_path);
 
         $self->log->debug("Copying ".$file->{name}." to $dest_path$dest_filename");
         system("cp","--sparse=always","-r","-L",$file->{name},$dest_path.$dest_filename) == 0 
@@ -116,7 +116,7 @@ method install_nfs($file)
                 $path .= '/' if $path !~ m,/$,;
         }
 
-        $self->make_dir($nfs_dir) if not -d $nfs_dir;
+        $self->makedir($nfs_dir) if not -d $nfs_dir;
         
         $self->log->debug("mount -a $path $nfs_dir");
 

@@ -149,27 +149,6 @@ method log_and_exec(@cmd)
 }
 ;
 
-=head2 make_dir
-
-Checks whether a given directory exists and creates it if not.
-
-@param string - directory to create
-
-@return success - 0
-@return error   - error string
-
-=cut 
-
-method make_dir($dir)
-{
-        if (-e $dir and not -d $dir) {
-                unlink $dir;
-        }
-        system("mkdir","-p",$dir) == 0 or return "Can't create $dir:$!";
-        return 0;
-};
-
-
 
 =head2 guest_install
 
@@ -198,7 +177,7 @@ method guest_install($sub, $partition, $image)
                 ($error, $loop) = $self->log_and_exec("losetup --show -f");
                 return $loop if $error;
                 $loop = basename($loop);
-                $self->make_dir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
+                $self->makedir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
                 return $retval if $retval = $self->log_and_exec("losetup /dev/$loop $image");
                 return $retval if $retval = $self->log_and_exec("kpartx -a /dev/$loop");
                 return $retval if $retval = $self->log_and_exec("mount /dev/mapper/$loop$partition ".$self->cfg->{paths}{guest_mount_dir});
