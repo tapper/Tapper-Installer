@@ -3,19 +3,25 @@
 use warnings;
 use strict;
 use Log::Log4perl;
+use Daemon::Daemonize qw/:all/;
+
 use Artemis::Installer::Base;
 
 BEGIN {
 	Log::Log4perl::init('/etc/log4perl.cfg');
 }
 
-my $pid = fork();
-die "Can not fork:$!" if not defined $pid;
+# don't use the config of the last simnow session
+system("rm","/etc/artemis") if -e "/etc/artemis";
 
-if ($pid == 0) {
-        my $client = new Artemis::Installer::Base;
-        $client->system_install("simnow");
-}
+
+Daemon::Daemonize->daemonize(close => "std");
+
+
+my $client = new Artemis::Installer::Base;
+$client->system_install("simnow");
+
+
 
 
 =pod
