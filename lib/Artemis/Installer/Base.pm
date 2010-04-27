@@ -16,6 +16,7 @@ use Artemis::Installer::Precondition::PRC;
 use Artemis::Installer::Precondition::Rawimage;
 use Artemis::Installer::Precondition::Repository;
 use Artemis::Installer::Precondition::Exec;
+use Artemis::Installer::Precondition::Simnow;
 
 extends 'Artemis::Installer';
 
@@ -176,6 +177,11 @@ method system_install($state)
                 {
                         my $exec=Artemis::Installer::Precondition::Exec->new($config);
                         $retval = $self->precondition_install($precondition, $exec);
+                }
+                elsif ($precondition->{precondition_type} eq 'simnow_backend')
+                {
+                        my $simnow=Artemis::Installer::Precondition::Simnow->new($config);
+                        $retval = $self->precondition_install($precondition, $simnow);
                 }
 
                 if ($retval) {
