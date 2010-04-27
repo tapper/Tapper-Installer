@@ -193,7 +193,7 @@ method system_install($state)
                 }
         }
 
-        $self->cleanup() unless $config->{no_cleanup};
+        $self->cleanup() unless $config->{no_cleanup} or $state eq 'simnow';
 
         if ( $state eq "standard" and  not ($config->{skip_prepare_boot})) {
                 $self->logdie($retval) if $retval = $image->prepare_boot();
@@ -209,7 +209,15 @@ method system_install($state)
                 }
                 when ('simnow'){
                         #FIXME: don't use hardcoded path
-                        system("/opt/artemis/bin/perl","/opt/artemis/bin/artemis-simnow-start");
+                        my $simnow_config = $self->cfg->{files}{simnow_config};
+                        $retval = qx(/opt/artemis/bin/perl /opt/artemis/bin/artemis-simnow-start --config=$simnow_config);
+                        if ($?) {
+                                $self->log->error("Can not start simnow: $retval");
+                                $self->mcp_send({state => 'error-test',
+                                                 error => "Can not start simnow: $retval",
+                                                 prc_number => 0});
+                        }
+;
                 }
         }
         return 0;
