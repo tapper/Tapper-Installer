@@ -64,7 +64,8 @@ method install ($exec)
 
                 close $read;
 		# chroot to execute script inside the future root file system
-                my ($error, $output)=$self->log_and_exec("mount -o bind /dev/ ".$self->cfg->{paths}{base_dir}."/dev");
+                my ($error, $output) = $self->log_and_exec("mount -o bind /dev/ ".$self->cfg->{paths}{base_dir}."/dev");
+                ($error, $output)    = $self->log_and_exec("mount -t sysfs sys ".$self->cfg->{paths}{base_dir}."/sys");
 		chroot $self->cfg->{paths}{base_dir};
 		chdir ("/");
                 ($error, $output)=$self->log_and_exec($filename,@options);
@@ -87,6 +88,7 @@ method install ($exec)
                         $self->file_save($output,$outfile);
                 }
                 ($error, $output)=$self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
+                ($error, $output)=$self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/sys");
                 waitpid($pid,0);
                 if ($?) {
                         return("executing $filename failed");
