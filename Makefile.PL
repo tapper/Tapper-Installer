@@ -18,7 +18,7 @@ build_requires 'Artemis::Test' => '2.010005';
 build_requires 'File::Temp';
 
 
-requires 'Artemis::Remote' => '1.000015';
+requires 'Artemis::Remote' => '1.000018';
 requires 'Artemis::Base'   => '0.010015';
 requires 'File::Basename';
 requires 'File::Path';
