@@ -114,7 +114,7 @@ should be send to the server by Log4perl.
 method system_install($state)
 {
         my $retval;
-        $state //= 'standard';  # always defined value for state
+        $state ||= 'standard';  # always defined value for state
         # fetch configurations from the server
         my $consumer = Artemis::Remote::Config->new;
 
@@ -197,7 +197,9 @@ method system_install($state)
 
         if ( $state eq "standard" and  not ($config->{skip_prepare_boot})) {
                 $self->logdie($retval) if $retval = $image->prepare_boot();
+
         }
+        $image->unmount();
 
         $self->mcp_inform("end-install");
         $self->log->info("Finished installation of test machine");

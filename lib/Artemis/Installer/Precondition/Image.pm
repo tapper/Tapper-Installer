@@ -7,6 +7,11 @@ use Method::Signatures;
 use Moose;
 extends 'Artemis::Installer::Precondition';
 
+has images => ( isa => 'ArrayRef',
+                is  => 'rw',
+                default => sub {[]},
+              );
+
 
 =head1 NAME
 
@@ -358,8 +363,10 @@ method install($image)
                 return $retval if $retval=$self->copy_image( $partition, $image->{image}, $mount_point);
         } else {
                 $self->log->debug("No image to install on $partition, mounting old image to $mount_point");
-                return $retval if $retval=$self->log_and_exec("mount $partition $mount_point");
-
+                if ($retval=$self->log_and_exec("mount $partition $mount_point")) {
+                        $self->images([ @{$self->images}, $mount_point ]);
+                        return $retval;
+                }
         }
         push (@{$self->cfg->{images}},$image);
 
@@ -513,6 +520,8 @@ method install_image_iso($image_file, $partition_size, $device_file, $mount_poin
         my $retval;
         return $retval if $retval=$self->log_and_exec("dd if=$image_file of=$device_file");
         return $retval if $retval=$self->log_and_exec("mount $device_file $mount_point");
+        $self->images([ @{$self->images}, $mount_point ]);
+
         return(0);
 };
 
@@ -543,6 +552,8 @@ method install_image_tar($image_file, $partition_size, $device_file, $mount_poin
         my $retval;
         return $retval if $retval=$self->log_and_exec("mkfs.ext3 -q -L $partition_label $device_file");
         return $retval if $retval=$self->log_and_exec("mount $device_file $mount_point");
+        $self->images([ @{$self->images}, $mount_point ]);
+
         return $retval if $retval=$self->log_and_exec("tar xf $image_file -C $mount_point");
         return 0;
 };
@@ -572,6 +583,8 @@ method install_image_gz($image_file, $partition_size, $device_file, $mount_point
         my $retval;
         return $retval if $retval=$self->log_and_exec("mkfs.ext3 -q -L $partition_label $device_file");
         return $retval if $retval=$self->log_and_exec("mount $device_file $mount_point");
+        $self->images([ @{$self->images}, $mount_point ]);
+
         return $retval if $retval=$self->log_and_exec("tar xfz $image_file -C $mount_point");
         return 0;
 };
@@ -601,6 +614,8 @@ method install_image_bz2($image_file, $partition_size, $device_file, $mount_poin
         my $retval;
         return $retval if $retval=$self->log_and_exec("mkfs.ext3 -q -L $partition_label $device_file");
         return $retval if $retval=$self->log_and_exec("mount $device_file $mount_point");
+        $self->images([ @{$self->images}, $mount_point ]);
+
         return $retval if $retval=$self->log_and_exec("tar xfj $image_file -C $mount_point");
         return 0;
 };
@@ -629,6 +644,25 @@ method copy_image($device_file, $image_file, $mount_point)
         }
 	return $self->install_image($image_file, $device_file, $mount_point);
 };
+
+=head2 unmount
+
+Umounts all images that were mounted during installation in reverse
+order.
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub unmount
+{
+        my ($self) = @_;
+        foreach my $image (reverse @{$self->images}) {
+                $self->log_and_exec('umount', $image);
+        }
+        return 0;
+}
 
 1;
 
