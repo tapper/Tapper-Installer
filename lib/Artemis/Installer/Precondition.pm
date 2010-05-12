@@ -199,7 +199,11 @@ method guest_install($sub, $partition, $image)
         if ($image and $partition) {
                 return $retval if $retval = $self->log_and_exec("umount /dev/mapper/loop0$partition");
                 return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
-                return $retval if $retval = $self->log_and_exec("losetup -d /dev/loop0");
+                if ($retval = $self->log_and_exec("losetup -d /dev/loop0")) {
+                        sleep (2);
+                        return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
+                        return $retval if $retval = $self->log_and_exec("losetup -d /dev/loop0");
+                }
         }
         elsif ($image and not $partition) {
                 return $retval if $retval = $self->log_and_exec("umount ".$self->cfg->{paths}{guest_mount_dir});
