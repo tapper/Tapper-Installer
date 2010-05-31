@@ -30,6 +30,47 @@ Artemis::Installer::Base - Install everything needed for a test.
 
 =cut
 
+=head2 free_loop_device
+
+Make sure /dev/loop0 is usable for losetup and kpartx.
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub free_loop_device
+{
+        my ($self) = @_;
+        my ($error, $dev) = $self->log_and_exec('losetup', '-f');
+
+        return if !$error and $dev eq '/dev/loop0';
+        ($error, $dev) = $self->log_and_exec("mount | grep loop0 | cut -f 3 -d ' '");
+        return $dev if $error; # can not search for mounts
+
+        if ($dev) {
+                $error = $self->log_and_exec("umount $dev");
+                if ($error) {
+                        my $processes;
+                        ($error, $processes) =
+                          $self->log_and_exec('lsof -t +D $dev 2>/dev/null');
+                        foreach my $proc (split "\n", $processes) {
+                                kill 15, $proc;
+                                sleep 2;
+                                kill 9, $proc;
+                        }
+                        $error = $self->log_and_exec("umount $dev");
+                        return $error if $error;
+                }
+        }
+
+        ($error, $dev) = $self->log_and_exec("kpartx -d /dev/loop0");
+        return $dev if $error;
+
+        ($error, $dev) = $self->log_and_exec("losetup -d /dev/loop0");
+        return;
+}
+
 =head2 cleanup
 
 Clean a set of predefine file by deleting all of their content. This prevents
@@ -127,6 +168,11 @@ method system_install($state)
 
         $self->log->info("Starting installation of test machine");
         $self->mcp_inform("start-install") unless $state eq "autoinstall";
+
+        if ($state eq 'simnow') {
+                $retval = $self->free_loop_device();
+                $self->logdie($retval) if $retval;
+        }
 
 
         my $image=Artemis::Installer::Precondition::Image->new($config);
