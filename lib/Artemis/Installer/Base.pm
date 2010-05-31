@@ -1,11 +1,9 @@
 package Artemis::Installer::Base;
 
-use strict;
-use warnings;
-use 5.010;
-
 use Method::Signatures;
 use Moose;
+
+use common::sense;
 
 use Artemis::Remote::Config;
 use Artemis::Installer::Precondition::Image;
