@@ -269,7 +269,8 @@ method create_menu_lst_entry($device_file)
         $id ||="unknown";
         my $entry                = "title Test run $id\n".
           "root (hd$grub_device,$partition_number)\n".
-            "kernel /boot/vmlinuz root=$device_file console=ttyS0,115200 ip=dhcp noapic artemis_host=".$self->cfg->{server}."\n";
+            "kernel /boot/vmlinuz root=$device_file earlyprintk=serial,ttyS0,115200 ".
+              "console=ttyS0,115200 ip=dhcp noapic artemis_host=".$self->cfg->{server}."\n";
         $entry .= "initrd /boot/initrd\n\n" if -e $self->cfg->{paths}{base_dir}."/boot/initrd";
 
 

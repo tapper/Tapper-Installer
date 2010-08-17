@@ -9,8 +9,10 @@ use File::Temp qw/tempdir/;
 
 BEGIN { use_ok('Artemis::Installer::Precondition');
         use_ok('Artemis::Installer::Precondition::Image');
- }
+        use_ok('Artemis::Installer::Base');
+}
 
+my $mock_base = Test::MockModule->new('Artemis::Base');
 
 {
         # testing gethostname with an IP address will try to set the hostname
@@ -42,5 +44,11 @@ my $config     = {paths => {grubpath => $grub_dir}};
 my $inst_image = Artemis::Installer::Precondition::Image->new($config);
 my $retval     = $inst_image->generate_pxe_grub();
 is ($retval, 0, 'Generating PXE grub config'); 
+
+$mock_base->mock('log_and_exec', sub{ return });
+my $base = Artemis::Installer::Base->new();
+$retval = $base->free_loop_device();
+ok(!$retval, 'free_loop_device');
+
 
 done_testing();

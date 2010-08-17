@@ -4,6 +4,7 @@ use Moose;
 use common::sense;
 
 use Artemis::Installer::Precondition::PRC;
+use YAML;
 
 extends 'Artemis::Installer::Precondition';
 
@@ -27,7 +28,8 @@ Artemis::Installer::Precondition::Simnow - Generate configs for Simnow
 sub create_simnow_config
 {
         my ($self, $config) = @_;
-        $config->{files}{config_file} = $config->{paths}{simnow_path}."/scripts/startup.simnow";
+        my $simnow_script = $config->{files}{simnow_script} || 'startup.simnow';
+        $config->{files}{simnow_script} = $config->{paths}{simnow_path}."/scripts/$simnow_script";
         return $config;
 }
 
