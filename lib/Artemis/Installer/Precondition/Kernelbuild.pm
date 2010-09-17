@@ -110,6 +110,10 @@ sub make_initrd
                 return "kernel installed failed, /boot/vmlinuz-$kernelversion does not exist" 
                   if not -e "/boot/vmlinuz-$kernelversion";
         }
+
+        system('depmod $kernelversion $kernelversion') == 0
+          or return("Can not create initrd file, see log file");
+
         
         system('mkinitrd -k /boot/vmlinuz-$kernelversion -i /boot/initrd-$kernelversion') == 0
           or return("Can not create initrd file, see log file");
