@@ -111,7 +111,7 @@ sub make_initrd
                   if not -e "/boot/vmlinuz-$kernelversion";
         }
 
-        system('depmod $kernelversion $kernelversion') == 0
+        system("depmod $kernelversion") == 0
           or return("Can not create initrd file, see log file");
 
         
