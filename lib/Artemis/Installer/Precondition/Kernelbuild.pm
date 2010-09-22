@@ -47,15 +47,34 @@ repository. It changes the current directory into the the repository.
 sub git_get
 {
 	my ($self, $git_url, $git_rev)=@_;
-        
+
         # git may generate more output than log_and_exec can handle, thus keep the system()
         chdir $self->cfg->{paths}{base_dir};
-	system("git","clone","-q",$git_url,"linux") == 0 
+	system("git","clone","-q",$git_url,"linux") == 0
           or return("unable to clone git repository $git_url");
 	chdir ("linux");
-        system("git","checkout",$git_rev) == 0 
+        system("git","checkout",$git_rev) == 0
           or return("unable to check out $git_rev from git repository $git_url");
 	return(0);
+}
+
+=head2 get_config
+
+Get the kernel config.
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub get_config
+{
+        my ($self) = @_;
+        my $path = $self->cfg->{paths}{config_path}."/kernelconfigs/";
+        $self->log->debug("Getting config $path/config_x86_64");
+        system("cp $path/config_x86_64 .config") == 0
+          or return "Can not get config $path/config_x86_64: $!";
+        return 0;
 }
 
 =head2 make_kernel
@@ -70,20 +89,19 @@ Build and install a kernel and write all log messages to STDOUT/STDERR.
 sub make_kernel
 {
         my ($self) = @_;
-        chdir('linux');
-        system("make","mrproper") == 0
+        system("make","clean") == 0
           or return("Making mrproper failed: $!");
-        
+
         system('yes ""|make oldconfig') == 0
           or return("Making oldconfig failed: $!");
 
         system('make','-j8') == 0
           or return("Build the kernel failed: $!");
 
-        system('make','install') == 0 
+        system('make','install') == 0
           or return("Installing the kernel failed: $!");
 
-        system('make','modules_install') == 0 
+        system('make','modules_install') == 0
           or return("Installing the kernel failed: $!");
 
         return 0;
@@ -107,18 +125,19 @@ sub make_initrd
 
         if (not -e "/boot/vmlinuz-$kernelversion") {
                 $kernelversion .='+'; # handle broken release strings in current kernels
-                return "kernel installed failed, /boot/vmlinuz-$kernelversion does not exist" 
+                return "kernel installed failed, /boot/vmlinuz-$kernelversion does not exist"
                   if not -e "/boot/vmlinuz-$kernelversion";
         }
 
         system("depmod $kernelversion") == 0
           or return("Can not create initrd file, see log file");
 
-        
-        system('mkinitrd -k /boot/vmlinuz-$kernelversion -i /boot/initrd-$kernelversion') == 0
+        my $mkinitrd_command = "mkinitrd -k /boot/vmlinuz-$kernelversion -i /boot/initrd-$kernelversion";
+        $self->log->debug($mkinitrd_command);
+        system($mkinitrd_command) == 0
           or return("Can not create initrd file, see log file");
 
-        # prepare_boot called at the end of the install process will generate 
+        # prepare_boot called at the end of the install process will generate
         # a grub entry for vmlinuz/initrd with no version string attached
         $error = $self->log_and_exec("ln -sf","/boot/vmlinuz-$kernelversion", "/boot/vmlinuz");
         return $error if $error;
@@ -188,6 +207,12 @@ sub install
                         exit $?;
                 }
 
+                $error = $self->get_config($self);
+                if ($error) {
+                        print(write $error,"\n");
+                        exit $?;
+                }
+
 
                 $ENV{ARTEMIS_TESTRUN}         = $self->cfg->{test_run};
                 $ENV{ARTEMIS_SERVER}          = $self->cfg->{mcp_host};
@@ -200,7 +225,8 @@ sub install
 
 		# chroot to execute script inside the future root file system
 		chroot $self->cfg->{paths}{base_dir};
-		chdir ("/");
+                chdir('linux');
+
                 $error = $self->make_kernel();
                 if ($error) {
                         print( $write $error, "\n");
