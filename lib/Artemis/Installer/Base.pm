@@ -6,14 +6,15 @@ use Moose;
 use common::sense;
 
 use Artemis::Remote::Config;
-use Artemis::Installer::Precondition::Image;
-use Artemis::Installer::Precondition::Package;
 use Artemis::Installer::Precondition::Copyfile;
+use Artemis::Installer::Precondition::Exec;
 use Artemis::Installer::Precondition::Fstab;
+use Artemis::Installer::Precondition::Image;
+use Artemis::Installer::Precondition::Kernelbuild;
 use Artemis::Installer::Precondition::PRC;
+use Artemis::Installer::Precondition::Package;
 use Artemis::Installer::Precondition::Rawimage;
 use Artemis::Installer::Precondition::Repository;
-use Artemis::Installer::Precondition::Exec;
 use Artemis::Installer::Precondition::Simnow;
 
 extends 'Artemis::Installer';
@@ -226,6 +227,11 @@ method system_install($state)
                 {
                         my $simnow=Artemis::Installer::Precondition::Simnow->new($config);
                         $retval = $self->precondition_install($precondition, $simnow);
+                }
+                elsif ($precondition->{precondition_type} eq 'kernelbuild')
+                {
+                        my $kernelbuild=Artemis::Installer::Precondition::Kernelbuild->new($config);
+                        $retval = $self->precondition_install($precondition, $kernelbuild);
                 }
 
                 if ($retval) {
