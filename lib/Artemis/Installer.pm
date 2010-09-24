@@ -11,7 +11,7 @@ use YAML::Syck;
 extends 'Artemis::Base';
 with 'MooseX::Log::Log4perl';
 
-our $VERSION = '2.000144';
+our $VERSION = '2.000145';
 
 =head1 NAME
 
