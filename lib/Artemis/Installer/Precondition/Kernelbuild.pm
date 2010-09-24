@@ -69,11 +69,15 @@ Get the kernel config.
 
 sub get_config
 {
-        my ($self) = @_;
-        my $path = $self->cfg->{paths}{config_path}."/kernelconfigs/";
-        $self->log->debug("Getting config $path/config_x86_64");
-        system("cp $path/config_x86_64 .config") == 0
-          or return "Can not get config $path/config_x86_64: $!";
+        my ($self, $config_file) = @_;
+        $config_file ||= $self->cfg->{paths}{config_path}."/kernelconfigs/config_x86_64";
+        $self->log->debug("Getting config $config_file");
+
+        return "Can not get config $config_file because the file does not exist"
+          if not -e $config_file;
+
+        system("cp $config_file .config") == 0
+          or return "Can not get config $config_file";
         return 0;
 }
 
@@ -164,8 +168,9 @@ kernel and initrd file.
 sub install
 {
         my ($self, $build) = @_;
-        my $git_url  = $build->{git_url} or return 'No git url given';
-        my $git_rev  = $build->{git_changeset} || 'HEAD';
+        my $git_url     = $build->{git_url} or return 'No git url given';
+        my $git_rev     = $build->{git_changeset} || 'HEAD';
+        my $config_file = $build->{configfile_path};
 
 	$self->log->debug("Installing kernel from $git_url $git_rev");
 
@@ -207,7 +212,7 @@ sub install
                         exit $?;
                 }
 
-                $error = $self->get_config($self);
+                $error = $self->get_config($config_file);
                 if ($error) {
                         print(write $error,"\n");
                         exit $?;
