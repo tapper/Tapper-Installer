@@ -209,13 +209,13 @@ sub install
                 $error = $self->git_get($git_url, $git_rev);
                 if ($error) {
                         print(write $error,"\n");
-                        exit $?;
+                        exit -1;
                 }
 
                 $error = $self->get_config($config_file);
                 if ($error) {
                         print(write $error,"\n");
-                        exit $?;
+                        exit -1;
                 }
 
 
@@ -235,13 +235,13 @@ sub install
                 $error = $self->make_kernel();
                 if ($error) {
                         print( $write $error, "\n");
-                        exit 1;
+                        exit -1;
                 }
 
                 $error = $self->make_initrd();
                 if ($error) {
                         print( $write $error, "\n");
-                        exit 1;
+                        exit -1;
                 }
 
                 close $write;
