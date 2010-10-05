@@ -139,7 +139,7 @@ sub make_initrd
         my $modules = "ixgbe forcedeth r8169 libata sata-sil scsi-mod atiixp ide-disk";
         $modules   .= " ide-core 3c59x tg3 mii amd8111e e1000e bnx2 bnx2x ixgb";
         my $mkinitrd_command = "mkinitrd -k /boot/vmlinuz-$kernelversion -i /boot/initrd-$kernelversion ";
-        $mkinitrd_command   .= "-m $modules";
+        $mkinitrd_command   .= qq(-m "$modules");
         
         $self->log->debug($mkinitrd_command);
         system($mkinitrd_command) == 0
