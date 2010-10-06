@@ -12,6 +12,7 @@ author_requires 'Module::Install::WriteAll';
 
 build_requires 'Test::More';
 build_requires 'Test::Deep';
+build_requires 'Test::Perl::Critic';
 build_requires 'Test::Fixture::DBIC::Schema';
 build_requires 'Test::MockModule';
 build_requires 'Artemis::Test' => '2.010005';
