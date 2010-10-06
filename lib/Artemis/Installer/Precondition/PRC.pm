@@ -220,16 +220,16 @@ sub install
 
         $self->makedir("$basedir/etc") if not -d "$basedir/etc";
 
-        open FILE, '>',"$basedir/etc/artemis" or return "Can not open /etc/artemis in $basedir:$!";
-        print FILE YAML::Dump($config);
-        close FILE;
+        open my $FILE, '>',"$basedir/etc/artemis" or return "Can not open /etc/artemis in $basedir:$!";
+        print $FILE YAML::Dump($config);
+        close $FILE;
 
         ($error, $config) = $self->create_win_config($prc);
         return $config if $error;
 
-        open FILE, '>',$basedir.'/test.config' or return "Can not open /test.config in $basedir:$!";
-        print FILE YAML::Dump($config);
-        close FILE;
+        open $FILE, '>', $basedir.'/test.config' or return "Can not open /test.config in $basedir:$!";
+        print $FILE YAML::Dump($config);
+        close $FILE;
 
 
         

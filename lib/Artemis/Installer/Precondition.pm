@@ -228,16 +228,16 @@ Save output as file for MCP to find it and upload it to reports receiver.
 
 method file_save($output, $filename)
 {
-        my $testrun_id = $self->cfg->{test_run}; 
+        my $testrun_id = $self->cfg->{test_run};
         my $destdir = $self->cfg->{paths}{output_dir}."/$testrun_id/install/";
         my $destfile = $destdir."/$filename";
         if (not -d $destdir) {
                 system("mkdir","-p",$destdir) == 0 or return ("Can't create $destdir:$!");
         }
-        open(FH,">",$destfile)  
+        open(my $FH,">",$destfile)
           or return ("Can't open $destfile:$!");
-        print FH $output;
-        close FH;
+        print $FH $output;
+        close $FH;
 };
 
 

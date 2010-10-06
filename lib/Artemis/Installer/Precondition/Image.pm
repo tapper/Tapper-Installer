@@ -113,16 +113,16 @@ method configure_fstab()
         print STDERR "Artemis::Installer::Precondition::Image.configure_fstab()\n";
 
         # ss5 sschwigo 2008-09-30 ">" to ">>", real append (does this fix the "missing /var" warnings?)
-        open (FSTAB, ">>", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
+        open (my $FSTAB, ">>", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
 
         # write defaults for fstab
-        print FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tnoauto\t0 0\n";
+        print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tnoauto\t0 0\n";
 
         foreach my $image (@{$self->cfg->{images}}) {
-                print FSTAB $image->{partition},"\t",$image->{mount},"\text3\tdefaults\t1 1\n";
+                print $FSTAB $image->{partition},"\t",$image->{mount},"\text3\tdefaults\t1 1\n";
         }
 
-        close FSTAB or return "Can't write fstab: $!"; # well, cases when close fails are rare but still exist
+        close $FSTAB or return "Can't write fstab: $!"; # well, cases when close fails are rare but still exist
         return 0;
 };
 
@@ -319,9 +319,9 @@ method write_menu_lst($content, $truncate)
                 $mode = '>';
         }
 
-        open (FILE, $mode,$menu_lst_file) or return "Can't open $menu_lst_file for writing: $!";
-        print FILE $content;
-        close FILE or return "Can't write $menu_lst_file: $!"; # well, cases when close fails are rare but still exist;
+        open (my $FILE, $mode,$menu_lst_file) or return "Can't open $menu_lst_file for writing: $!";
+        print $FILE $content;
+        close $FILE or return "Can't write $menu_lst_file: $!"; # well, cases when close fails are rare but still exist;
         return 0;
 }
 ;

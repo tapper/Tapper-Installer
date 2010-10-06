@@ -68,9 +68,9 @@ method install($img)
         my $mountdir = $self->cfg->{paths}{guest_mount_dir};
         
         mkdir ("$mountdir/etc") or return ("Can't create /etc in raw image $filename: $!");
-        open(FH,">","$mountdir/etc/artemis-release") or return "Can't open /etc/artemis-release in raw image $filename: $!";
-        print FH "Artemis";
-        close FH;
+        open(my $FH,">","$mountdir/etc/artemis-release") or return "Can't open /etc/artemis-release in raw image $filename: $!";
+        print $FH "Artemis";
+        close $FH;
 
         ($error, $retval) = $self->log_and_exec("umount $mountdir");
         return $retval if $error;

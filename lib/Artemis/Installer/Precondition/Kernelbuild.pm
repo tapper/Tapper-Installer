@@ -203,8 +203,8 @@ sub install
                 my $output_file = $output_dir."/$filename";
                 # dup output to file before git_get and chroot but inside child
                 # so we don't need to care how to get rid of it at the end
-                open (STDOUT, ">>$output_file.stdout") or print($write "Can't open output file $output_file.stdout: $!\n"),exit 1;
-                open (STDERR, ">>$output_file.stderr") or print($write "Can't open output file $output_file.stderr: $!\n"),exit 1;
+                open (STDOUT, ">>", "$output_file.stdout") or print($write "Can't open output file $output_file.stdout: $!\n"),exit 1;
+                open (STDERR, ">>", "$output_file.stderr") or print($write "Can't open output file $output_file.stderr: $!\n"),exit 1;
 
                 $error = $self->git_get($git_url, $git_rev);
                 if ($error) {
