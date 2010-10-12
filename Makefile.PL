@@ -3,7 +3,7 @@ use inc::Module::Install;
 name     'Artemis-Installer';
 all_from 'lib/Artemis/Installer.pm';
 author   'OSRC SysInt Team <osrc-sysint@elbe.amd.com>';
-license  'perl';
+license  'freebsd';
 
 install_script 'bin/artemis-installer-client.pl';
 install_script 'bin/artemis-installer-simnow.pl';
