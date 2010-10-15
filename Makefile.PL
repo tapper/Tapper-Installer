@@ -25,7 +25,7 @@ requires 'File::Basename';
 requires 'File::Path';
 requires 'File::Type';
 requires 'Hash::Merge::Simple';
-
+requires 'File::ShareDir';
 
 requires 'Daemon::Daemonize';    # for simnow installer
 requires 'IPC::Open3';
