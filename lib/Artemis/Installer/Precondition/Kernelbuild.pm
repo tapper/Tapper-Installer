@@ -111,6 +111,14 @@ sub make_kernel
         return 0;
 }
 
+=head2 younger
+
+Sort function, sort files based on modification time.
+
+=cut
+
+sub younger { stat($a)->mtime() <=> stat($b)->mtime() }
+
 =head2 make_initrd
 
 Build and install an initrd and write all log messages to STDOUT/STDERR.
@@ -126,12 +134,25 @@ sub make_initrd
         my ($error, $kernelversion) = $self->log_and_exec("make","kernelversion");
         return $kernelversion if $error;
         return "Can not get kernel version" unless $kernelversion;
-
-        if (not -e "/boot/vmlinuz-$kernelversion") {
-                $kernelversion .='+'; # handle broken release strings in current kernels
-                return "kernel installed failed, /boot/vmlinuz-$kernelversion does not exist"
-                  if not -e "/boot/vmlinuz-$kernelversion";
-        }
+        
+        # double block, the outermost belongs to if, the innermost can be left with last
+        # great stuff, isn't it?
+        if (not -e "/boot/vmlinuz-$kernelversion") {{
+                if (-e "/boot/vmlinuz-${kernelversion}+"){
+                        $kernelversion .='+';
+                        last;
+                }
+                my @files = sort younger <boot/vmlinuz-*>;
+                if (@files and $files[0] =~/vmlinuz-(.+)/) {
+                        $kernelversion = $1;
+                        last;
+                }
+                my $filename;
+                $filename = join("/",$self->cfg->{paths}{output_dir}, 
+                                 $self->cfg->{test_run}, "install", "bootdir-content");
+                system("ls -l /boot/ > $filename");
+                return "kernel install failed, can not find new kernel";
+        }}
 
         system("depmod $kernelversion") == 0
           or return("Can not create initrd file, see log file");
