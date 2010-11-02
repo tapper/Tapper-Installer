@@ -173,9 +173,9 @@ sub create_win_config
                         my $list_element = $prc->{config}->{testprogram_list}->[$i];
                         $config->{"test".$i."_prog"}            = $list_element->{program};
                         $config->{"test".$i."_prog"}          ||= $list_element->{test_program};
-                        $config->{"test".$i."_prog"}            = $list_element->{program};
                         $config->{"test".$i."_runtime_default"} = $list_element->{runtime};
-                        $config->{"test".$i."_timeout"}         = $list_element->{testprogram};
+                        $config->{"test".$i."_timeout"}         = $list_element->{timeout};
+                        $config->{"test".$i."_timeout"}       ||= $list_element->{timeout_testprogram};
                 }
         } elsif ($prc->{config}->{test_program}) {
                 $config->{test0_prog}            = $prc->{config}->{test_program};
