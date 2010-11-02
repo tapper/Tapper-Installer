@@ -419,7 +419,9 @@ method prepare_boot()
         my $retval = 0;
         return $retval if $retval = $self->configure_fstab();
         return $retval if $retval = $self->generate_grub_menu_lst( );
-	return $retval if $retval = $self->generate_pxe_grub();
+# With generate_pxe_grub we always boot from second harddisc        
+#	return $retval if $retval = $self->generate_pxe_grub();
+	return $retval if $retval = $self->copy_menu_lst();
         return 0;
 };
 
