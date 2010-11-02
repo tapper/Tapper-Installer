@@ -181,7 +181,6 @@ sub create_win_config
                 $config->{test0_prog}            = $prc->{config}->{test_program};
                 $config->{test0_runtime_default} = $prc->{config}->{runtime};
                 $config->{test0_timeout}         = $prc->{config}->{timeout_testprogram}
-
         }
         
         return (0, $config);
