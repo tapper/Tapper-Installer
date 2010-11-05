@@ -164,8 +164,9 @@ method system_install($state)
         $self->{cfg}=$config;
         $self->logdie("can't get local data: $config") if ref $config ne "HASH";
 
-        # Just mount everything in the fstab. This isn't perfect but enough for now.
-        system("mount","-a") unless $state eq "simnow";
+        my $net = Artemis::Remote::Net->new;
+        $retval = $net->nfs_mount() unless state eq 'simnow';
+        $self->logdie($retval) if $retval;
 
         $self->log->info("Installing testrun (".$self->cfg->{testrun_id}.") on host ".$self->cfg->{hostname});
         $self->mcp_inform("start-install") unless $state eq "autoinstall";
@@ -174,7 +175,6 @@ method system_install($state)
                 $retval = $self->free_loop_device();
                 $self->logdie($retval) if $retval;
         }
-
 
         my $image=Artemis::Installer::Precondition::Image->new($config);
         if ($state eq "standard") {
