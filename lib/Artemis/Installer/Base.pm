@@ -167,7 +167,7 @@ method system_install($state)
         # Just mount everything in the fstab. This isn't perfect but enough for now.
         system("mount","-a") unless $state eq "simnow";
 
-        $self->log->info("Starting installation of test machine");
+        $self->log->info("Installing testrun (".$self->cfg->{testrun_id}.") on host ".$self->cfg->{hostname});
         $self->mcp_inform("start-install") unless $state eq "autoinstall";
 
         if ($state eq 'simnow') {
