@@ -6,6 +6,7 @@ use Moose;
 use common::sense;
 
 use Artemis::Remote::Config;
+use Artemis::Remote::Net;
 use Artemis::Installer::Precondition::Copyfile;
 use Artemis::Installer::Precondition::Exec;
 use Artemis::Installer::Precondition::Fstab;
@@ -164,8 +165,8 @@ method system_install($state)
         $self->{cfg}=$config;
         $self->logdie("can't get local data: $config") if ref $config ne "HASH";
 
-        my $net = Artemis::Remote::Net->new;
-        $retval = $net->nfs_mount() unless state eq 'simnow';
+        my $net = Artemis::Remote::Net->new($config);
+        $retval = $net->nfs_mount() unless $state eq 'simnow';
         $self->logdie($retval) if $retval;
 
         $self->log->info("Starting installation of test machine");
