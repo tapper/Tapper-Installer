@@ -18,7 +18,7 @@ extends 'Artemis::Installer';
 =head1 NAME
 
 Artemis::Installer::Precondition - Base class with common functions
-for Artemis::Installer::Precondition modules 
+for Artemis::Installer::Precondition modules
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ method get_file_type($file)
                 return(0,"rpm");
         } elsif ($type eq "deb") {
                 return(0,"deb");
-        } 
+        }
 
         if (not -e $file) {
                 return (0,"$file does not exist. Can't check file type");
@@ -72,7 +72,7 @@ method get_file_type($file)
                 return (0, "Getting file type of $file failed: $output") if $error;
                 return (0,"iso") if $output =~m/ISO 9660/i;
                 return (0,"rpm") if $output =~m/$file: RPM/i;
-                return (0,"deb") if $output =~m/$file: Debian/i; 
+                return (0,"deb") if $output =~m/$file: Debian/i;
         } elsif ($type eq "application/x-dpkg") {
                 return (0,"deb");
         } elsif ($type eq "application/x-gzip") {
@@ -158,7 +158,7 @@ parameter or a device name (in which case the third arguement has to be undef)
 
 @param sub    - execute this function with base dir set to mounted image file
 @param string - partition number to mount inside the image
-@param string - (optional) image file path 
+@param string - (optional) image file path
 
 @return success - 0
 @return error   - error string
@@ -180,12 +180,12 @@ method guest_install($sub, $partition, $image)
                 return $retval if $retval = $self->log_and_exec("losetup /dev/loop0 $image");
                 return $retval if $retval = $self->log_and_exec("kpartx -a /dev/loop0");
                 return $retval if $retval = $self->log_and_exec("mount /dev/mapper/loop0$partition ".$self->cfg->{paths}{guest_mount_dir});
-        } 
+        }
         elsif ($image and not $partition) {
                 return $retval if $retval = $self->log_and_exec("mount -o loop $image ".$self->cfg->{paths}{guest_mount_dir});
-        
-        } 
-        else 
+
+        }
+        else
         {
                 return $retval if $retval = $self->get_device($partition);
                 $partition = $retval;
@@ -197,17 +197,19 @@ method guest_install($sub, $partition, $image)
         return $retval if $retval=$sub->($object);
 
         if ($image and $partition) {
-                return $retval if $retval = $self->log_and_exec("umount /dev/mapper/loop0$partition");
-                return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
-                return $retval if $retval = $self->log_and_exec("losetup -d /dev/loop0");
+                $retval = $self->log_and_exec("umount /dev/mapper/loop0$partition");
+                $self->log->error("Can not unmount /dev/mapper/loop0$partition: $retval") if $retval;
         }
-        elsif ($image and not $partition) {
-                return $retval if $retval = $self->log_and_exec("umount ".$self->cfg->{paths}{guest_mount_dir});
-        
-        } 
-        else 
+        else
         {
-                return $retval if $retval = $self->log_and_exec("umount ".$self->cfg->{paths}{guest_mount_dir});
+                $retval = $self->log_and_exec("umount ".$self->cfg->{paths}{guest_mount_dir});
+                $self->log->error("Can not unmount ".$self->cfg->{paths}{guest_mount_dir}.": $retval") if $retval;
+        }
+
+        # seems like mount -o loop uses a loop device that is not freed at umount
+        if ($image) {
+                $self->log_and_exec("kpartx -d /dev/loop0");
+                $self->log_and_exec("losetup -d /dev/loop0");
         }
 
         return 0;
@@ -228,13 +230,13 @@ Save output as file for MCP to find it and upload it to reports receiver.
 
 method file_save($output, $filename)
 {
-        my $testrun_id = $self->cfg->{test_run}; 
+        my $testrun_id = $self->cfg->{test_run};
         my $destdir = $self->cfg->{paths}{output_dir}."/$testrun_id/install/";
         my $destfile = $destdir."/$filename";
         if (not -d $destdir) {
                 system("mkdir","-p",$destdir) == 0 or return ("Can't create $destdir:$!");
         }
-        open(FH,">",$destfile)  
+        open(FH,">",$destfile)
           or return ("Can't open $destfile:$!");
         print FH $output;
         close FH;
