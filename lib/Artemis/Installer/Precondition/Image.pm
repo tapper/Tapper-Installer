@@ -135,9 +135,18 @@ Generate a simple PXE grub config that forwards to local grub.
 
 =cut
 
-method generate_pxe_grub()
+sub generate_pxe_grub
 {
+        my ($self) = @_;
+
+        my $partition = $self->cfg->{preconditions}->[0]->{partition};
         my $hostname = $self->gethostname();
+	my $partition_number = $self->get_partition_number( $partition );
+	my ($error, $grub_device) = $self->get_grub_device( $partition );
+        return $grub_device if $error;
+
+        
+
         my $filename = $self->cfg->{paths}{grubpath}."/$hostname.lst";
         open my $fh, ">", $filename or return "Can not open PXE grub file $filename: $!";
         print $fh
@@ -145,7 +154,7 @@ method generate_pxe_grub()
             "terminal serial\n",
               "timeout 2\n\n",
                 "title Boot from first hard disc\n",
-                  "chainloader (hd0,1)+1";
+                  "chainloader (hd$grub_device,$partition_number)+1";
         close $fh or return "Closing PXE grub file $filename of NFS failed: $!";
         return 0;
 };
@@ -237,6 +246,7 @@ method generate_grub_menu_lst()
           if not $self->cfg->{preconditions}->[0]->{precondition_type} eq 'image'
             and $self->cfg->{preconditions}->[0]->{mount} eq '/';
 
+        # XXX: use $self->images->[0] and check whether this is correct
         my $partition = $self->cfg->{preconditions}->[0]->{partition};
 
         if ($self->cfg->{grub}) {
@@ -419,9 +429,8 @@ method prepare_boot()
         my $retval = 0;
         return $retval if $retval = $self->configure_fstab();
         return $retval if $retval = $self->generate_grub_menu_lst( );
-# With generate_pxe_grub we always boot from second harddisc        
-#	return $retval if $retval = $self->generate_pxe_grub();
-	return $retval if $retval = $self->copy_menu_lst();
+	return $retval if $retval = $self->generate_pxe_grub();
+# 	return $retval if $retval = $self->copy_menu_lst();
         return 0;
 };
 
