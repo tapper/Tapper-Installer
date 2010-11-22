@@ -113,16 +113,16 @@ method configure_fstab()
         print STDERR "Artemis::Installer::Precondition::Image.configure_fstab()\n";
 
         # ss5 sschwigo 2008-09-30 ">" to ">>", real append (does this fix the "missing /var" warnings?)
-        open (FSTAB, ">>", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
+        open (my $FSTAB, ">>", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
 
         # write defaults for fstab
-        print FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tnoauto\t0 0\n";
+        print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tnoauto\t0 0\n";
 
         foreach my $image (@{$self->cfg->{images}}) {
-                print FSTAB $image->{partition},"\t",$image->{mount},"\text3\tdefaults\t1 1\n";
+                print $FSTAB $image->{partition},"\t",$image->{mount},"\text3\tdefaults\t1 1\n";
         }
 
-        close FSTAB or return "Can't write fstab: $!"; # well, cases when close fails are rare but still exist
+        close $FSTAB or return "Can't write fstab: $!"; # well, cases when close fails are rare but still exist
         return 0;
 };
 
@@ -135,9 +135,18 @@ Generate a simple PXE grub config that forwards to local grub.
 
 =cut
 
-method generate_pxe_grub()
+sub generate_pxe_grub
 {
+        my ($self) = @_;
+
+        my $partition = $self->cfg->{preconditions}->[0]->{partition};
         my $hostname = $self->gethostname();
+	my $partition_number = $self->get_partition_number( $partition );
+	my ($error, $grub_device) = $self->get_grub_device( $partition );
+        return $grub_device if $error;
+
+        
+
         my $filename = $self->cfg->{paths}{grubpath}."/$hostname.lst";
         open my $fh, ">", $filename or return "Can not open PXE grub file $filename: $!";
         print $fh
@@ -145,7 +154,7 @@ method generate_pxe_grub()
             "terminal serial\n",
               "timeout 2\n\n",
                 "title Boot from first hard disc\n",
-                  "chainloader (hd0,1)+1";
+                  "chainloader (hd$grub_device,$partition_number)+1";
         close $fh or return "Closing PXE grub file $filename of NFS failed: $!";
         return 0;
 };
@@ -237,6 +246,7 @@ method generate_grub_menu_lst()
           if not $self->cfg->{preconditions}->[0]->{precondition_type} eq 'image'
             and $self->cfg->{preconditions}->[0]->{mount} eq '/';
 
+        # XXX: use $self->images->[0] and check whether this is correct
         my $partition = $self->cfg->{preconditions}->[0]->{partition};
 
         if ($self->cfg->{grub}) {
@@ -319,9 +329,9 @@ method write_menu_lst($content, $truncate)
                 $mode = '>';
         }
 
-        open (FILE, $mode,$menu_lst_file) or return "Can't open $menu_lst_file for writing: $!";
-        print FILE $content;
-        close FILE or return "Can't write $menu_lst_file: $!"; # well, cases when close fails are rare but still exist;
+        open (my $FILE, $mode,$menu_lst_file) or return "Can't open $menu_lst_file for writing: $!";
+        print $FILE $content;
+        close $FILE or return "Can't write $menu_lst_file: $!"; # well, cases when close fails are rare but still exist;
         return 0;
 }
 ;
@@ -420,6 +430,7 @@ method prepare_boot()
         return $retval if $retval = $self->configure_fstab();
         return $retval if $retval = $self->generate_grub_menu_lst( );
 	return $retval if $retval = $self->generate_pxe_grub();
+# 	return $retval if $retval = $self->copy_menu_lst();
         return 0;
 };
 

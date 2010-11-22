@@ -170,18 +170,17 @@ sub create_win_config
                 for (my $i=0; $i< int @{$prc->{config}->{testprogram_list}}; $i++) {
                         # string concatenation for hash keys, otherwise perl can't tell whether
                         # $i ot $i_prog is the name of the variable
-                        $config->{"test".$i."_prog"}            = 
-                          $prc->{config}->{testprogram_list}->[$i]->{test_program};
-                        $config->{"test".$i."_runtime_default"} = 
-                          $prc->{config}->{testprogram_list}->[$i]->{runtime};
-                        $config->{"test".$i."_timeout"}         = 
-                          $prc->{config}->{testprogram_list}->[$i]->{timeout_testprogram};
+                        my $list_element = $prc->{config}->{testprogram_list}->[$i];
+                        $config->{"test".$i."_prog"}            = $list_element->{program};
+                        $config->{"test".$i."_prog"}          ||= $list_element->{test_program};
+                        $config->{"test".$i."_runtime_default"} = $list_element->{runtime};
+                        $config->{"test".$i."_timeout"}         = $list_element->{timeout};
+                        $config->{"test".$i."_timeout"}       ||= $list_element->{timeout_testprogram};
                 }
         } elsif ($prc->{config}->{test_program}) {
                 $config->{test0_prog}            = $prc->{config}->{test_program};
                 $config->{test0_runtime_default} = $prc->{config}->{runtime};
                 $config->{test0_timeout}         = $prc->{config}->{timeout_testprogram}
-
         }
         
         return (0, $config);
@@ -220,16 +219,16 @@ sub install
 
         $self->makedir("$basedir/etc") if not -d "$basedir/etc";
 
-        open FILE, '>',"$basedir/etc/artemis" or return "Can not open /etc/artemis in $basedir:$!";
-        print FILE YAML::Dump($config);
-        close FILE;
+        open my $FILE, '>',"$basedir/etc/artemis" or return "Can not open /etc/artemis in $basedir:$!";
+        print $FILE YAML::Dump($config);
+        close $FILE;
 
         ($error, $config) = $self->create_win_config($prc);
         return $config if $error;
 
-        open FILE, '>',$basedir.'/test.config' or return "Can not open /test.config in $basedir:$!";
-        print FILE YAML::Dump($config);
-        close FILE;
+        open $FILE, '>', $basedir.'/test.config' or return "Can not open /test.config in $basedir:$!";
+        print $FILE YAML::Dump($config);
+        close $FILE;
 
 
         

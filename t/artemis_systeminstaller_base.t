@@ -42,8 +42,7 @@ is ($inst_base->get_file_type('t/file_type/tarfile'), 'tar', 'Detected tar using
 my $grub_dir   = tempdir( CLEANUP => 1 );
 my $config     = {paths => {grubpath => $grub_dir}};
 my $inst_image = Artemis::Installer::Precondition::Image->new($config);
-my $retval     = $inst_image->generate_pxe_grub();
-is ($retval, 0, 'Generating PXE grub config'); 
+my $retval;
 
 $mock_base->mock('log_and_exec', sub{ return });
 my $base = Artemis::Installer::Base->new();

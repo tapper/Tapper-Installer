@@ -6,14 +6,16 @@ use Moose;
 use common::sense;
 
 use Artemis::Remote::Config;
-use Artemis::Installer::Precondition::Image;
-use Artemis::Installer::Precondition::Package;
+use Artemis::Remote::Net;
 use Artemis::Installer::Precondition::Copyfile;
+use Artemis::Installer::Precondition::Exec;
 use Artemis::Installer::Precondition::Fstab;
+use Artemis::Installer::Precondition::Image;
+use Artemis::Installer::Precondition::Kernelbuild;
 use Artemis::Installer::Precondition::PRC;
+use Artemis::Installer::Precondition::Package;
 use Artemis::Installer::Precondition::Rawimage;
 use Artemis::Installer::Precondition::Repository;
-use Artemis::Installer::Precondition::Exec;
 use Artemis::Installer::Precondition::Simnow;
 
 extends 'Artemis::Installer';
@@ -163,17 +165,17 @@ method system_install($state)
         $self->{cfg}=$config;
         $self->logdie("can't get local data: $config") if ref $config ne "HASH";
 
-        # Just mount everything in the fstab. This isn't perfect but enough for now.
-        system("mount","-a") unless $state eq "simnow";
+        my $net = Artemis::Remote::Net->new($config);
+        $retval = $net->nfs_mount() unless $state eq 'simnow';
+        $self->logdie($retval) if $retval;
 
-        $self->log->info("Starting installation of test machine");
+        $self->log->info("Installing testrun (".$self->cfg->{testrun_id}.") on host ".$self->cfg->{hostname});
         $self->mcp_inform("start-install") unless $state eq "autoinstall";
 
         if ($state eq 'simnow') {
                 $retval = $self->free_loop_device();
                 $self->logdie($retval) if $retval;
         }
-
 
         my $image=Artemis::Installer::Precondition::Image->new($config);
         if ($state eq "standard") {
@@ -226,6 +228,11 @@ method system_install($state)
                 {
                         my $simnow=Artemis::Installer::Precondition::Simnow->new($config);
                         $retval = $self->precondition_install($precondition, $simnow);
+                }
+                elsif ($precondition->{precondition_type} eq 'kernelbuild')
+                {
+                        my $kernelbuild=Artemis::Installer::Precondition::Kernelbuild->new($config);
+                        $retval = $self->precondition_install($precondition, $kernelbuild);
                 }
 
                 if ($retval) {
