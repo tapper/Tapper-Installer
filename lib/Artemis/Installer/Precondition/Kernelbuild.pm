@@ -30,6 +30,25 @@ patchdir: /patches
 
 =cut
 
+=head2 fix_git_url
+
+URL rewrite.
+
+@param string git_url
+
+@return string - fixed git url
+
+=cut
+
+sub fix_git_url
+{
+	my ($self, $git_url) = @_;
+        $self->log->info("Git URL before rewrite: $git_url");
+	$git_url =~ s|^git://osrc((\.osrc)?\.amd\.com)?/|git://wotan.amd.com/|;
+        $self->log->info("Git URL after  rewrite: $git_url");
+	return $git_url;
+}
+
 =head2 git_get
 
 This function encapsulates getting a kernel source directory out of a git
@@ -50,6 +69,7 @@ sub git_get
 
         # git may generate more output than log_and_exec can handle, thus keep the system()
         chdir $self->cfg->{paths}{base_dir};
+	$git_url = $self->fix_git_url($git_url);
 	system("git","clone","-q",$git_url,"linux") == 0
           or return("unable to clone git repository $git_url");
 	chdir ("linux");
@@ -216,6 +236,7 @@ sub install
                 # TODO: handle error
                 ($error, $output) = $self->log_and_exec("mount -o bind /dev/ ".$self->cfg->{paths}{base_dir}."/dev");
                 ($error, $output) = $self->log_and_exec("mount -t sysfs sys ".$self->cfg->{paths}{base_dir}."/sys");
+                ($error, $output) = $self->log_and_exec("mount -t proc proc ".$self->cfg->{paths}{base_dir}."/proc");
 
                 my $filename = $git_url.$git_rev;
                 $filename =~ s/[^A-Za-z_-]+/_/g;
@@ -281,8 +302,9 @@ sub install
                         last MSG_FROM_CHILD if not $tmpout;
                         $output.=$tmpout;
                 }
-                $self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
                 $self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/sys");
+                $self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
+                $self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/proc");
                 waitpid($pid,0);
                 if ($?) {
                         return("Building kernel from $git_url $git_rev failed: $output");
