@@ -30,6 +30,25 @@ patchdir: /patches
 
 =cut
 
+=head2 fix_git_url
+
+URL rewrite.
+
+@param string git_url
+
+@return string - fixed git url
+
+=cut
+
+sub fix_git_url
+{
+	my ($self, $git_url) = @_;
+        $self->log->info("Git URL before rewrite: $git_url");
+	$git_url =~ s|^git://osrc((\.osrc)?\.amd\.com)?/|git://wotan.amd.com/|;
+        $self->log->info("Git URL after  rewrite: $git_url");
+	return $git_url;
+}
+
 =head2 git_get
 
 This function encapsulates getting a kernel source directory out of a git
@@ -50,6 +69,7 @@ sub git_get
 
         # git may generate more output than log_and_exec can handle, thus keep the system()
         chdir $self->cfg->{paths}{base_dir};
+	$git_url = $self->fix_git_url($git_url);
 	system("git","clone","-q",$git_url,"linux") == 0
           or return("unable to clone git repository $git_url");
 	chdir ("linux");
@@ -132,24 +152,36 @@ sub make_initrd
 {
         my ($self) = @_;
         my ($error, $kernelversion) = $self->log_and_exec("make","kernelversion");
-        return $kernelversion if $error;
-        return "Can not get kernel version" unless $kernelversion;
+        my $kernel_file = "vmlinuz-$kernelversion";
         
-        # double block, the outermost belongs to if, the innermost can be left with last
+        # double block, the outermost belongs to if, the innermost can be left with last;
         # great stuff, isn't it?
-        if (not -e "/boot/vmlinuz-$kernelversion") {{
+        if (not -e "/boot/$kernel_file") {{
                 if (-e "/boot/vmlinuz-${kernelversion}+"){
                         $kernelversion .='+';
+                        $kernel_file = "vmlinuz-$kernelversion";
                         last;
                 }
-                my @files = sort younger <boot/vmlinuz-*>;
-                if (@files and $files[0] =~/vmlinuz-(.+)/) {
-                        $kernelversion = $1;
+                if (-e "/boot/bzImage") {
+                        $kernel_file = "bzImage";
+                        last;
+                }
+                if (-e "/boot/bzImage-$kernelversion") {
+                        $kernel_file = "bzImage-$kernelversion";
+                        last;
+                }
+                if (-e "/boot/bzImage-$kernelversion+") {
+                        $kernel_file = "bzImage-$kernelversion";
+                        last;
+                }
+
+                my @files = sort younger </boot/vmlinuz-*>;
+                if (@files and $files[0] =~/vmlinuz-(.*)/) {
+                        $kernel_file = "vmlinuz-$1";
                         last;
                 }
                 my $filename;
-                $filename = join("/",$self->cfg->{paths}{output_dir}, 
-                                 $self->cfg->{test_run}, "install", "bootdir-content");
+                $filename = join("/tmp/bootdir-content");
                 system("ls -l /boot/ > $filename");
                 return "kernel install failed, can not find new kernel";
         }}
@@ -159,7 +191,7 @@ sub make_initrd
 
         my $modules = "ixgbe forcedeth r8169 libata sata-sil scsi-mod atiixp ide-disk";
         $modules   .= " ide-core 3c59x tg3 mii amd8111e e1000e bnx2 bnx2x ixgb";
-        my $mkinitrd_command = "mkinitrd -k /boot/vmlinuz-$kernelversion -i /boot/initrd-$kernelversion ";
+        my $mkinitrd_command = "mkinitrd -k /boot/$kernel_file -i /boot/initrd-$kernelversion ";
         $mkinitrd_command   .= qq(-m "$modules");
         
         $self->log->debug($mkinitrd_command);
@@ -168,7 +200,7 @@ sub make_initrd
 
         # prepare_boot called at the end of the install process will generate
         # a grub entry for vmlinuz/initrd with no version string attached
-        $error = $self->log_and_exec("ln -sf","/boot/vmlinuz-$kernelversion", "/boot/vmlinuz");
+        $error = $self->log_and_exec("ln -sf","/boot/$kernel_file", "/boot/vmlinuz");
         return $error if $error;
         $error = $self->log_and_exec("ln -sf","/boot/initrd-$kernelversion", "/boot/initrd");
         return $error if $error;
@@ -216,6 +248,7 @@ sub install
                 # TODO: handle error
                 ($error, $output) = $self->log_and_exec("mount -o bind /dev/ ".$self->cfg->{paths}{base_dir}."/dev");
                 ($error, $output) = $self->log_and_exec("mount -t sysfs sys ".$self->cfg->{paths}{base_dir}."/sys");
+                ($error, $output) = $self->log_and_exec("mount -t proc proc ".$self->cfg->{paths}{base_dir}."/proc");
 
                 my $filename = $git_url.$git_rev;
                 $filename =~ s/[^A-Za-z_-]+/_/g;
@@ -281,8 +314,15 @@ sub install
                         last MSG_FROM_CHILD if not $tmpout;
                         $output.=$tmpout;
                 }
-                $self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
+                # save logfile from within chroot
+                if (-e  $self->cfg->{paths}{base_dir}."/tmp/bootdir-content" ) {
+                        log_and_exec("cp",$self->cfg->{paths}{base_dir}."/tmp/bootdir-content",
+                                     $self->cfg->{paths}{output_dir}."/".$self->cfg->{test_run}."/install/");
+                }
+
                 $self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/sys");
+                $self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/dev");
+                $self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/proc");
                 waitpid($pid,0);
                 if ($?) {
                         return("Building kernel from $git_url $git_rev failed: $output");
