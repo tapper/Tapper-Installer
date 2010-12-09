@@ -2,6 +2,8 @@
 
 ### BEGIN INIT INFO
 # Required-Start:  $ALL
+# Required-Stop: 
+# Provides: artemis
 # Default-Start: 3 5 
 # Default-Stop: 1 6
 # Description: (redhat) Start artemis program run control
