@@ -197,8 +197,13 @@ method guest_install($sub, $partition, $image)
         return $retval if $retval=$sub->($object);
 
         if ($image and $partition) {
-                $retval = $self->log_and_exec("umount /dev/mapper/loop0$partition");
-                $self->log->error("Can not unmount /dev/mapper/loop0$partition: $retval") if $retval;
+                return $retval if $retval = $self->log_and_exec("umount /dev/mapper/loop0$partition");
+                return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
+                if ($retval = $self->log_and_exec("losetup -d /dev/loop0")) {
+                        sleep (2);
+                        return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
+                        return $retval if $retval = $self->log_and_exec("losetup -d /dev/loop0");
+                }
         }
         else
         {

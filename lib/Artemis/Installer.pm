@@ -71,6 +71,7 @@ sub mcp_send
         my ($self, $message) = @_;
         my $server = $self->cfg->{mcp_host} or return "MCP host unknown";
         my $port   = $self->cfg->{mcp_port} || 7357;
+        $message->{testrun_id} ||= $self->cfg->{testrun_id};
 
         my $yaml = Dump($message);
 	if (my $sock = IO::Socket::INET->new(PeerAddr => $server,
