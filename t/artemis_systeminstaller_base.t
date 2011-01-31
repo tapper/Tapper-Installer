@@ -12,7 +12,7 @@ BEGIN { use_ok('Artemis::Installer::Precondition');
         use_ok('Artemis::Installer::Base');
 }
 
-my $mock_base = Test::MockModule->new('Artemis::Base');
+my $mock_base = Test::MockModule->new('Tapper::Base');
 
 {
         # testing gethostname with an IP address will try to set the hostname

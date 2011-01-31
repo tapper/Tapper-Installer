@@ -20,7 +20,7 @@ build_requires 'File::Temp';
 
 
 requires 'Artemis::Remote' => '1.000026';
-requires 'Artemis::Base'   => '0.010015';
+requires 'Tapper::Base'   => '0.010015';
 requires 'File::Basename';
 requires 'File::Path';
 requires 'File::Type';
