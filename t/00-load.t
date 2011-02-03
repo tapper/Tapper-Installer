@@ -6,19 +6,19 @@ use warnings;
 use Test::More;
 
 my @modules = (
-               'Artemis::Installer',
-               'Artemis::Installer::Base',
-               'Artemis::Installer::Precondition',
-               'Artemis::Installer::Precondition::Copyfile',
-               'Artemis::Installer::Precondition::Exec',
-               'Artemis::Installer::Precondition::Fstab',
-               'Artemis::Installer::Precondition::Image',
-               'Artemis::Installer::Precondition::Kernelbuild',
-               'Artemis::Installer::Precondition::Package',
-               'Artemis::Installer::Precondition::PRC',
-               'Artemis::Installer::Precondition::Rawimage',
-               'Artemis::Installer::Precondition::Repository',
-               'Artemis::Installer::Precondition::Simnow',
+               'Tapper::Installer',
+               'Tapper::Installer::Base',
+               'Tapper::Installer::Precondition',
+               'Tapper::Installer::Precondition::Copyfile',
+               'Tapper::Installer::Precondition::Exec',
+               'Tapper::Installer::Precondition::Fstab',
+               'Tapper::Installer::Precondition::Image',
+               'Tapper::Installer::Precondition::Kernelbuild',
+               'Tapper::Installer::Precondition::Package',
+               'Tapper::Installer::Precondition::PRC',
+               'Tapper::Installer::Precondition::Rawimage',
+               'Tapper::Installer::Precondition::Repository',
+               'Tapper::Installer::Precondition::Simnow',
               );
 
 plan tests => 2*(int @modules);
@@ -34,4 +34,4 @@ foreach my $module(@modules) {
 
 
 
-diag( "Testing Artemis $Artemis::Installer::VERSION, Perl $], $^X" );
+diag( "Testing Tapper $Tapper::Installer::VERSION, Perl $], $^X" );
