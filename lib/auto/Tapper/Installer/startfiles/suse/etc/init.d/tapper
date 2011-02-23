@@ -1,0 +1,50 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Required-Start: $ALL $network $remote_fs $syslog $xend
+# Provides: tapper
+# Default-Start: 3 5 
+# Default-Stop: 1 6
+# Required-Stop:
+# Description: (suse) Start tapper program run control
+### END INIT INFO
+# chkconfig: 35 99 99
+# description: (suse) Start tapper program run control
+
+# ss5 sschwigo 2008-09-29 TODO: that's a dirty hack
+# mount natrium:/vol/osrc_home/ /home
+
+#needed for NFS
+if [[ -e /etc/init.d/portmap ]]
+then
+	/etc/init.d/portmap start
+fi
+
+
+STARTSCRIPT=
+FILENAME="tapper-automatic-test.pl"
+POSSIBLE_PATHS="
+/mnt/opt/tapper/bin/
+/opt/tapper/bin/
+/home/tapper/perl510/bin/
+"
+
+for(( i=0; i<10; i++)) 
+do
+    ping -c1 bancroft > /dev/null && break
+    echo "wait for network available..."
+    sleep 2
+done
+
+
+mount natrium:/vol/osrc_home/ /home
+for DIR in $POSSIBLE_PATHS; do
+    STARTSCRIPT=${DIR}/$FILENAME
+    if [[ -e $STARTSCRIPT ]]
+    then
+        /sbin/ifconfig
+        ${DIR}/perl $STARTSCRIPT $*
+        exit 0
+    fi
+done
+
