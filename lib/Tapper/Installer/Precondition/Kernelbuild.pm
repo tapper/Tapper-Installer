@@ -228,9 +228,11 @@ sub install
         my $git_url     = $build->{git_url} or return 'No git url given';
         my $git_rev     = $build->{git_changeset} || 'HEAD';
         my $config_file = $build->{configfile_path};
-
+        
 	$self->log->debug("Installing kernel from $git_url $git_rev");
 
+        my $git_path   = qx(which git);
+        return "Can not find git. Git_path is '$git_path'" if not -e $git_path;
 
 	pipe (my $read, my $write);
 	return ("Can't open pipe:$!") if not (defined $read and defined $write);
