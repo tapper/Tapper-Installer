@@ -8,7 +8,7 @@ license  'freebsd';
 install_script 'bin/tapper-installer-client.pl';
 install_script 'bin/tapper-installer-simnow.pl';
 
-author_requires 'Module::Install::WriteAll';
+author_requires ''Module::Install::WriteAll'';
 
 build_requires 'Test::More';
 build_requires 'Test::Deep';
