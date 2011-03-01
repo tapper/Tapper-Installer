@@ -15,7 +15,7 @@ our $VERSION = '3.000001';
 
 =head1 NAME
 
-Tapper::Installer - Install everything needed for a test.
+Tapper::Installer - Tapper - Install everything needed for a test
 
 =head1 SYNOPSIS
 
