@@ -2,7 +2,7 @@ use inc::Module::Install;
 
 name     'Tapper-Installer';
 all_from 'lib/Tapper/Installer.pm';
-author   'AMD OSRC Tapper Team <tapper@amd64.com>';
+author   'AMD OSRC Tapper Team <tapper@amd64.org>';
 license  'freebsd';
 
 install_script 'bin/tapper-installer-client.pl';
