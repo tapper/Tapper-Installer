@@ -34,4 +34,4 @@ foreach my $module(@modules) {
 
 
 
-diag( "Testing Tapper::Installer $Artemis::Installer::VERSION, Perl $], $^X" );
+diag( "Testing Tapper::Installer $Tapper::Installer::VERSION, Perl $], $^X" );
