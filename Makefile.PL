@@ -36,8 +36,8 @@ requires 'Log::Log4perl';
 requires 'Method::Signatures';
 requires 'Moose';
 
-requires 'YAML';
-requires 'YAML::Syck';
+requires 'YAML' => "0.72";
+requires 'YAML::Syck' => "1.17";
 
 auto_install;
 
