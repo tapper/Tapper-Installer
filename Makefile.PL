@@ -18,11 +18,11 @@ build_requires 'Test::Deep';
 build_requires 'Test::Perl::Critic';
 build_requires 'Test::Fixture::DBIC::Schema';
 build_requires 'Test::MockModule';
-build_requires 'Tapper::Test' => "3.000001";
+build_requires 'Tapper::Test' => "3.000002";
 build_requires 'File::Temp';
 
-requires 'Tapper::Remote' => "3.000001";
-requires 'Tapper::Base'   => "3.000001";
+requires 'Tapper::Remote' => "3.000002";
+requires 'Tapper::Base'   => "3.000002";
 requires 'File::Basename';
 requires 'File::Path';
 requires 'File::Type';
