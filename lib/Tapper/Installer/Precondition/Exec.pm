@@ -6,6 +6,8 @@ use warnings;
 use Method::Signatures;
 use Moose;
 use IO::Handle; # needed to set pipe nonblocking
+use IO::Select;
+
 extends 'Tapper::Installer::Precondition';
 
 
@@ -21,6 +23,24 @@ Tapper::Installer::Precondition::Exec - Execute a program inside the installed s
 
 =cut
 
+=head2 set_env_variables
+
+Set environment variables for executed command/program.
+
+=cut
+
+sub set_env_variables
+{
+        my ($self) = @_;
+
+        $ENV{TAPPER_TESTRUN}         = $self->cfg->{test_run};
+        $ENV{TAPPER_SERVER}          = $self->cfg->{mcp_host};
+        $ENV{TAPPER_REPORT_SERVER}   = $self->cfg->{report_server};
+        $ENV{TAPPER_REPORT_API_PORT} = $self->cfg->{report_api_port};
+        $ENV{TAPPER_REPORT_PORT}     = $self->cfg->{report_port};
+        $ENV{TAPPER_HOSTNAME}        = $self->cfg->{hostname};
+        return;
+}
 
 =head2 install
 
@@ -35,7 +55,7 @@ feature available to all other preconditions.
 
 =cut
 
-method install ($exec)
+sub install
 {
         my $filename = $exec->{filename};
         my @options;
@@ -48,19 +68,14 @@ method install ($exec)
         
 	pipe (my $read, my $write);
 	return ("Can't open pipe:$!") if not (defined $read and defined $write);
-	
+
 	# we need to fork for chroot
 	my $pid = fork();
 	return "fork failed: $!" if not defined $pid;
-	
+
 	# hello child
 	if ($pid == 0) {
-                $ENV{TAPPER_TESTRUN}         = $self->cfg->{test_run};
-                $ENV{TAPPER_SERVER}          = $self->cfg->{mcp_host};
-                $ENV{TAPPER_REPORT_SERVER}   = $self->cfg->{report_server};
-                $ENV{TAPPER_REPORT_API_PORT} = $self->cfg->{report_api_port};
-                $ENV{TAPPER_REPORT_PORT}     = $self->cfg->{report_port};
-                $ENV{TAPPER_HOSTNAME}        = $self->cfg->{hostname};
+                $self->set_env_variables;
 
                 close $read;
 		# chroot to execute script inside the future root file system
@@ -75,7 +90,7 @@ method install ($exec)
                 exit $error;
 	} else {
                 close $write;
-                my $select = new IO::Select( $read );
+                my $select = IO::Select->new( $read );
                 my ($error, $output);
         MSG_FROM_CHILD:
                 while (my @ready = $select->can_read()){
@@ -98,7 +113,7 @@ method install ($exec)
 		return(0);
 	}
 }
-;
+
 
 
 1;
