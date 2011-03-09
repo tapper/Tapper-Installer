@@ -57,15 +57,20 @@ feature available to all other preconditions.
 
 sub install
 {
-        my $filename = $exec->{filename};
+        my  ($self, $exec) = @_;
+
+        my $command = $exec->{command};
         my @options;
         @options = @{$exec->{options}} if $exec->{options};
 
-	$self->log->debug("executing $filename with options ",join (" ",@options));
+        if ($exec->{filename}) {
+                $command = $self->cfg->{paths}{base_dir}.$exec->{filename};
+                return("$command is not an executable") if not -x $command;
+        }
 
-        my $fullpath = $self->cfg->{paths}{base_dir}.$filename;
-        return("$filename is not an executable") if not -x $fullpath;
-        
+        $self->log->debug("executing $command with options ",join (" ",@options));
+
+
 	pipe (my $read, my $write);
 	return ("Can't open pipe:$!") if not (defined $read and defined $write);
 
@@ -84,7 +89,7 @@ sub install
                 ($error, $output)    = $self->log_and_exec("mount -t proc proc ".$self->cfg->{paths}{base_dir}."/proc");
 		chroot $self->cfg->{paths}{base_dir};
 		chdir ("/");
-                ($error, $output)=$self->log_and_exec($filename,@options);
+                ($error, $output)=$self->log_and_exec($command,@options);
                 print( $write $output, "\n") if $output;
                 close $write;
                 exit $error;
@@ -99,7 +104,7 @@ sub install
                         $output.=$tmpout;
                 }
                 if ($output) {
-                        my $outfile = $filename;
+                        my $outfile = $command;
                         $outfile =~ s/[^A-Za-z_-]/_/g;
                         $self->file_save($output,$outfile);
                 }
@@ -108,7 +113,7 @@ sub install
                 ($error, $output)=$self->log_and_exec("umount ".$self->cfg->{paths}{base_dir}."/proc");
                 waitpid($pid,0);
                 if ($?) {
-                        return("executing $filename failed");
+                        return("executing $command failed");
                 }
 		return(0);
 	}
