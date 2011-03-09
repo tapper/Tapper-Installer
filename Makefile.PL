@@ -31,6 +31,7 @@ requires 'File::ShareDir';
 
 requires 'Daemon::Daemonize';    # for simnow installer
 requires 'IPC::Open3';
+requires 'IO::Select';
 requires 'List::Util';
 requires 'Log::Log4perl';
 requires 'Method::Signatures';
