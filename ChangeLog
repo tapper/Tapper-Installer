@@ -1,0 +1,8 @@
+2011-03-08 Steffen Schwigon <steffen.schwigon@amd.com>
+
+	* v3.0.2
+	
+	* try to force YAML versions
+
+	* [FIX] error handling if git not installed
+

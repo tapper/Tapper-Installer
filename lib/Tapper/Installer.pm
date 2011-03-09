@@ -11,7 +11,7 @@ use YAML::Syck;
 extends 'Tapper::Base';
 with 'MooseX::Log::Log4perl';
 
-our $VERSION = '3.000001';
+our $VERSION = '3.000002';
 
 =head1 NAME
 
