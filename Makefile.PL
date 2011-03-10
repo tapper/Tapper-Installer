@@ -20,6 +20,8 @@ build_requires 'Test::Fixture::DBIC::Schema';
 build_requires 'Test::MockModule';
 build_requires 'Tapper::Test' => "3.000002";
 build_requires 'File::Temp';
+build_requires 'Cwd';
+
 
 requires 'Tapper::Remote' => "3.000002";
 requires 'Tapper::Base'   => "3.000002";
