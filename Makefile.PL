@@ -44,4 +44,7 @@ requires 'YAML::Syck' => "1.17";
 
 auto_install;
 
+repository 'git://github.com/amd/Tapper-Installer.git';
+bugtracker 'http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tapper-Installer';
+
 WriteAll;
