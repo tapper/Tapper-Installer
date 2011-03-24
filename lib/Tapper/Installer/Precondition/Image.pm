@@ -112,8 +112,6 @@ sub configure_fstab
 	# Creates fstab-entry for the final partition
 
         print STDERR "Tapper::Installer::Precondition::Image.configure_fstab()\n";
-
-        # ss5 sschwigo 2008-09-30 ">" to ">>", real append (does this fix the "missing /var" warnings?)
         open (my $FSTAB, ">>", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
 
         # write defaults for fstab
