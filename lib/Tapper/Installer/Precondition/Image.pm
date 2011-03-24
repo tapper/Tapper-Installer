@@ -32,7 +32,7 @@ or $device name (with or without preceding /dev/).
 Doesn't work with dev-mapper.
 
 @param string - device or reference to array with device ids
-@param string - base dir prepended to all paths (testing purpose) 
+@param string - base dir prepended to all paths (testing purpose)
 
 @returnlist success - ( 0, device name string)
 @returnlist error   - ( 1, error string)
@@ -144,7 +144,7 @@ sub generate_pxe_grub
 	my ($error, $grub_device) = $self->get_grub_device( $partition );
         return $grub_device if $error;
 
-        
+
 
         my $filename = $self->cfg->{paths}{grubpath}."/$hostname.lst";
         open my $fh, ">", $filename or return "Can not open PXE grub file $filename: $!";
@@ -371,22 +371,24 @@ sub install
         $image->{partition}=$partition;
         $self->log->debug("partition = $partition");
 
-        # moint points are set relative to test system root but installation
-        # needs it relative to current root
-        my $mount_point=$image->{mount};
-        $mount_point = $self->cfg->{paths}{base_dir}.$mount_point;
-	$self->create_mount_point($mount_point);
+        # mount points in image precondition are relative to test system root
+        # installation needs it relative to current root
+        my $mount_point = $self->cfg->{paths}{base_dir}.$image->{mount};
+	$error = $self->makedir($mount_point);
+        return $error if $error;
 
         if ($image->{image}) {
-                return $retval if $retval=$self->copy_image( $partition, $image->{image}, $mount_point);
+                $retval = $self->copy_image( $partition, $image->{image}, $mount_point);
+                return $retval if $retval;
         } else {
                 $self->log->debug("No image to install on $partition, mounting old image to $mount_point");
-                if ($retval=$self->log_and_exec("mount $partition $mount_point")) {
-                        $self->images([ @{$self->images}, $mount_point ]);
-                        return $retval;
-                }
+                $retval = $self->log_and_exec("mount","$partition","$mount_point");
+                return $retval if $retval;
         }
-        push (@{$self->cfg->{images}},$image);
+
+        my %image = %$image; # keep a changed version but don't change the original precondition
+        $image{mount} = $mount_point;
+        $self->images([ @{$self->images}, \%image ]);
 
         $self->log->debug("Image copied successfully");
 
@@ -443,29 +445,6 @@ sub prepare_boot
         return 0;
 }
 
-
-=head2 create_mount_point
-
-Create the mount point if its not an existing directory.
-
-@param string - mount point path
-
-@return success - 0
-@return error   - error string
-
-
-=cut
-
-sub create_mount_point
-{
-        my ($self, $mount_point) = @_;
-	# Creates mount_point if not exists
-        if (not -d $mount_point) {
-                unlink $mount_point;
-                system("mkdir","-p","$mount_point") and return ("Can't create mount point $mount_point");
-        }
-        return 0;
-}
 
 =head2 install_image
 
@@ -686,7 +665,9 @@ sub unmount
 {
         my ($self) = @_;
         foreach my $image (reverse @{$self->images}) {
-                $self->log_and_exec('umount', $image);
+                my $mount = $image->{mount};
+                next unless -d $mount;
+                $self->log_and_exec('umount', $mount);
         }
         return 0;
 }
