@@ -3,7 +3,6 @@ package Tapper::Installer::Precondition::Image;
 use strict;
 use warnings;
 
-use Method::Signatures;
 use Moose;
 extends 'Tapper::Installer::Precondition';
 
@@ -90,10 +89,11 @@ Get the label of a partition to be able to set it again at mkfs.
 
 =cut
 
-method get_partition_label($device_file)
+sub get_partition_label
 {
+        my ($self, $device_file) = @_;
         return $self->log_and_exec("e2label $device_file");
-};
+}
 
 
 =head2 configure_fstab
@@ -106,8 +106,9 @@ partitions.
 
 =cut
 
-method configure_fstab()
+sub configure_fstab
 {
+        my ($self) = @_;
 	# Creates fstab-entry for the final partition
 
         print STDERR "Tapper::Installer::Precondition::Image.configure_fstab()\n";
@@ -124,7 +125,7 @@ method configure_fstab()
 
         close $FSTAB or return "Can't write fstab: $!"; # well, cases when close fails are rare but still exist
         return 0;
-};
+}
 
 =head2 generate_pxe_grub
 
@@ -157,7 +158,7 @@ sub generate_pxe_grub
                   "chainloader (hd$grub_device,$partition_number)+1";
         close $fh or return "Closing PXE grub file $filename of NFS failed: $!";
         return 0;
-};
+}
 
 
 
@@ -173,15 +174,16 @@ using PXE grub.
 
 =cut
 
-method copy_menu_lst()
+sub copy_menu_lst
 {
+        my ($self) = @_;
         my $hostname      = $self->gethostname();
         my $menu_lst_file = $self->cfg->{paths}{base_dir}."/boot/grub/menu.lst";
 
         my $tapper_conf  = $self->cfg->{paths}{grubpath};
 
         return $self->log_and_exec("cp $menu_lst_file $tapper_conf/$hostname.lst");
-};
+}
 
 =head2 get_grub_device
 
@@ -194,8 +196,9 @@ Get the disc part of grub notation of a given device file eg. /dev/hda1.
 
 =cut
 
-method get_grub_device($device_file)
+sub get_grub_device
 {
+        my ($self, $device_file) = @_;
         (my $grub_search_string = $device_file) =~ s/[0-9]//g;
         my $mount_point=$self->cfg->{paths}{base_dir};               # root partition will always be mounted there
         my ($error,$grub_device) = $self->log_and_exec("/usr/sbin/grub-install","--recheck",
@@ -207,7 +210,7 @@ method get_grub_device($device_file)
                 $grub_device = 0;
   	}
 	return (0,$grub_device);
-};
+}
 
 
 =head2 get_partition_number
@@ -220,12 +223,13 @@ Get the partition part of grub notation of a given device file eg. /dev/hda1.
 
 =cut
 
-method get_partition_number($device_file)
+sub get_partition_number
 {
+        my ($self, $device_file) = @_;
 	(my $partition_number = $device_file) =~ s/[a-z\/]//g;
 	$partition_number--;
 	return $partition_number;
-};
+}
 
 =head2 generate_grub_menu_lst
 
@@ -238,8 +242,9 @@ create_new_menu_lst.
 
 =cut
 
-method generate_grub_menu_lst()
+sub generate_grub_menu_lst
 {
+        my ($self) = @_;
         my $retval;
 
         return("First precondition is not the root image")
@@ -256,7 +261,7 @@ method generate_grub_menu_lst()
                 return $retval if $retval = $self->create_menu_lst_entry($partition);
         }
 	return 0;
-};
+}
 
 =head2 create_menu_lst_entry
 
@@ -270,8 +275,9 @@ named /boot/vmlinuz.
 
 =cut
 
-method create_menu_lst_entry($device_file)
+sub create_menu_lst_entry
 {
+        my ($self, $device_file) = @_;
 	my $partition_number     = $self->get_partition_number($device_file);
 	my ($error,$grub_device) = $self->get_grub_device( $device_file);
         return $grub_device if $error;
@@ -285,7 +291,7 @@ method create_menu_lst_entry($device_file)
 
 
         return $self->write_menu_lst($entry,0);
-};
+}
 
 
 =head2 create_new_menu_lst
@@ -298,14 +304,15 @@ are silently overwritten.
 
 =cut
 
-method create_new_menu_lst()
+sub create_new_menu_lst
 {
+        my ($self) = @_;
         my $base = "serial --unit=0 --speed=115200\n".
           "terminal serial\n".
             "timeout 3\n".
               "default 0\n\n\n";
         return $self->write_menu_lst($base,"truncate");
-};
+}
 
 
 =head2 write_menu_lst
@@ -321,8 +328,9 @@ and testability.
 
 =cut
 
-method write_menu_lst($content, $truncate)
+sub write_menu_lst
 {
+        my ($self, $content, $truncate) = @_;
 	my $menu_lst_file = $self->cfg->{paths}{base_dir}."/boot/grub/menu.lst";
         my $mode = '>>';
         if ($truncate) {
@@ -349,8 +357,9 @@ installer functions so the caller doesn't need to care for preparations.
 
 =cut
 
-method install($image)
+sub install
 {
+        my ($self, $image) = @_;
         my $retval;
 
         # set partition name to the normalized value /dev/*
@@ -384,7 +393,7 @@ method install($image)
         $self->log->debug("Image copied successfully");
 
         return 0;
-};
+}
 
 
 =head2 generate_user_grub_conf
@@ -398,8 +407,9 @@ Generate grub config file menu.lst based upon user provided precondition.
 
 =cut
 
-method generate_user_grub_conf($device_file)
+sub generate_user_grub_conf
 {
+        my ($self, $device_file) = @_;
         my $mount_point=$self->cfg->{paths}{base_dir};
         my $conf_string=$self->cfg->{grub};
 
@@ -411,7 +421,7 @@ method generate_user_grub_conf($device_file)
         $conf_string =~ s/\$grubroot/(hd$grub_device,$partition_number)/g;
 
         return $self->write_menu_lst($conf_string, "truncate");
-};
+}
 
 
 
@@ -424,15 +434,16 @@ Make installed system ready for boot from hard disk.
 
 =cut
 
-method prepare_boot()
+sub prepare_boot
 {
+        my ($self) = @_;
         my $retval = 0;
         return $retval if $retval = $self->configure_fstab();
         return $retval if $retval = $self->generate_grub_menu_lst( );
 	return $retval if $retval = $self->generate_pxe_grub();
 # 	return $retval if $retval = $self->copy_menu_lst();
         return 0;
-};
+}
 
 
 =head2 create_mount_point
@@ -447,15 +458,16 @@ Create the mount point if its not an existing directory.
 
 =cut
 
-method create_mount_point($mount_point)
+sub create_mount_point
 {
+        my ($self, $mount_point) = @_;
 	# Creates mount_point if not exists
         if (not -d $mount_point) {
                 unlink $mount_point;
                 system("mkdir","-p","$mount_point") and return ("Can't create mount point $mount_point");
         }
         return 0;
-};
+}
 
 =head2 install_image
 
@@ -471,8 +483,9 @@ sure to set partition label reasonably.
 
 =cut
 
-method install_image($image_file, $device_file, $mount_point)
+sub install_image
 {
+        my ($self, $image_file, $device_file, $mount_point) = @_;
  	my ($error, $partition_size)=$self->log_and_exec("/sbin/blockdev --getsize64 $device_file");
         if ($error) {
                 $self->log->warn("Can't get size of partition $device_file: $partition_size. Won't check if images fits.");
@@ -503,7 +516,7 @@ method install_image($image_file, $device_file, $mount_point)
                 return("Imagetype could not be detected");
 	}
         return 0;
-};
+}
 
 
 =head2 install_image_iso
@@ -521,9 +534,9 @@ Install an image of type iso.
 
 =cut
 
-method install_image_iso($image_file, $partition_size, $device_file, $mount_point)
-
+sub install_image_iso
 {
+        my ($self, $image_file, $partition_size, $device_file, $mount_point) = @_;
         # -s return the size in byte
         if ( $partition_size and (-s $image_file) > $partition_size) {
                 return("Image $image_file is to big for device $device_file");
@@ -535,7 +548,7 @@ method install_image_iso($image_file, $partition_size, $device_file, $mount_poin
         $self->images([ @{$self->images}, $mount_point ]);
 
         return(0);
-};
+}
 
 
 =head2 install_image_tar
@@ -554,8 +567,9 @@ Install an image of type tar.
 
 =cut
 
-method install_image_tar($image_file, $partition_size, $device_file, $mount_point, $partition_label)
+sub install_image_tar
 {
+        my ($self, $image_file, $partition_size, $device_file, $mount_point, $partition_label) = @_;
         # -s return the size in byte
         if ( $partition_size and (-s $image_file) > $partition_size) {
                 return("Image $image_file is to big for device $device_file");
@@ -568,7 +582,7 @@ method install_image_tar($image_file, $partition_size, $device_file, $mount_poin
 
         return $retval if $retval=$self->log_and_exec("tar xf $image_file -C $mount_point");
         return 0;
-};
+}
 
 =head2 install_image_gz
 
@@ -585,8 +599,9 @@ Install an image of type tar.gz.
 
 =cut
 
-method install_image_gz($image_file, $partition_size, $device_file, $mount_point, $partition_label)
+sub install_image_gz
 {
+        my ($self, $image_file, $partition_size, $device_file, $mount_point, $partition_label) = @_;
         my $gz_factor=3.82;
         if ( $partition_size and (-s $image_file)*$gz_factor > $partition_size) {
                 return("Image $image_file is to big for device $device_file");
@@ -599,7 +614,7 @@ method install_image_gz($image_file, $partition_size, $device_file, $mount_point
 
         return $retval if $retval=$self->log_and_exec("tar xfz $image_file -C $mount_point");
         return 0;
-};
+}
 
 =head2 install_image_bz2
 
@@ -616,8 +631,9 @@ Install an image of type tar.bz2.
 
 =cut
 
-method install_image_bz2($image_file, $partition_size, $device_file, $mount_point, $partition_label)
+sub install_image_bz2
 {
+        my ($self, $image_file, $partition_size, $device_file, $mount_point, $partition_label) = @_;
         my $bz2_factor=4.30;
         if ( $partition_size and (-s $image_file)*$bz2_factor > $partition_size) {
                 return("Image $image_file is to big for device $device_file");
@@ -630,7 +646,7 @@ method install_image_bz2($image_file, $partition_size, $device_file, $mount_poin
 
         return $retval if $retval=$self->log_and_exec("tar xfj $image_file -C $mount_point");
         return 0;
-};
+}
 
 
 =head2 copy_image
@@ -646,8 +662,9 @@ Install an image to a given partition and mount it to a given mount point.
 
 =cut
 
-method copy_image($device_file, $image_file, $mount_point)
+sub copy_image
 {
+        my ($self, $device_file, $image_file, $mount_point) = @_;
         $image_file = $self->cfg->{paths}{image_dir}.$image_file if not -e $image_file;
 
 	# Image exists?
@@ -655,7 +672,7 @@ method copy_image($device_file, $image_file, $mount_point)
                 return("Image $image_file could not be found");
         }
 	return $self->install_image($image_file, $device_file, $mount_point);
-};
+}
 
 =head2 unmount
 
