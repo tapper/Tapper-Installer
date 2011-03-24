@@ -17,12 +17,12 @@ log4perl.appender.root.layout = SimpleLayout";
 Log::Log4perl->init(\$string);
 
 
-BEGIN { 
+BEGIN {
         use_ok('Tapper::Installer::Precondition::Image');
  }
 
 my $tempdir = tempdir( CLEANUP => 1 );
-my $config = {paths => 
+my $config = {paths =>
               {base_dir => $tempdir }
              };
 
@@ -37,10 +37,10 @@ SKIP:{
         skip "Can not test get_device since make dist kills symlinks", 3 unless -l "t/misc/dev/disk/by-label/testing";
         $retval = $image_installer->get_device('/dev/hda2','t/misc/');
         is($retval, "/dev/hda2", "Find device from single file without links");
-        
+
         $retval = $image_installer->get_device('testing','t/misc/');
         is($retval, "/dev/hda2", "Find device from single file with links");
-        
+
         $retval = $image_installer->get_device(['/dev/sda2','testing'],'t/misc/');
         is($retval, "/dev/hda2", "Find device from file list with links");
 }
