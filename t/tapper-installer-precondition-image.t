@@ -23,7 +23,10 @@ BEGIN {
 
 my $tempdir = tempdir( CLEANUP => 1 );
 my $config = {paths =>
-              {base_dir => $tempdir }
+              {
+               base_dir  => $tempdir,
+               image_dir => $tempdir,
+              }
              };
 
 my $precondition = {
@@ -76,6 +79,12 @@ for (my $i = 3; $i >= 1; $i--) {
         my $image = shift @results;
         is_deeply($image, ['umount',"$tempdir/mount$i"], "Umount directory ($i)");
 }
+
+$precondition->{image} = '/this/image/does/not/exists.tgz';
+
+$retval = $image_installer->install($precondition);
+is($retval, "Image ".$config->{paths}{image_dir}."/this/image/does/not/exists.tgz could not be found", 'Install nonexisting image');
+
 
 
 done_testing();
