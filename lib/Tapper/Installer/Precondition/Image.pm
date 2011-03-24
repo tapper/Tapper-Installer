@@ -24,6 +24,155 @@ Tapper::Installer::Precondition::Package - Install a package to a given location
 
 =cut
 
+=head2 get_partition_number
+
+Get the partition part of grub notation of a given device file eg. /dev/hda1.
+
+@param string - partition number
+
+@return int - grub device notation
+
+=cut
+
+sub get_partition_number
+{
+        my ($self, $device_file) = @_;
+	my ($partition_number) = $device_file) =~ m/(\d+)/;
+	$partition_number--;
+	return $partition_number;
+}
+
+=head2 get_grub_device
+
+Get the disc part of grub notation of a given device file eg. /dev/hda1.
+
+@param string - device file name
+
+@return success - (0, grub device notation)
+@return eror    - (1, error string)
+
+=cut
+
+sub get_grub_device
+{
+        my ($self, $device_file) = @_;
+        my ($grub_devive) = $device_file =~ m/[hs]d([a-z])/;
+        $grub_devive      =~ tr/[a-i]/[0-9]/;
+	if ($grub_device eq "") {
+                $self->log->warn( "Grub device not found, took '0'");
+                $grub_device = 0;
+  	}
+	return (0, $grub_device);
+}
+
+
+
+=head2 configure_fstab
+
+Write fstab on installed system based upon the installed images and
+partitions.
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub configure_fstab
+{
+        my ($self) = @_;
+	# Creates fstab-entry for the final partition
+
+        $self->log->debug("Configuring fstab to contain installed images");
+        open (my $FSTAB, ">>", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
+
+        # write defaults for fstab
+        print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tnoauto\t0 0\n";
+
+        foreach my $image (@{$self->images}) {
+                print $FSTAB $image->{partition},"\t",$image->{mount},"\text3\tdefaults\t1 1\n";
+        }
+
+        close $FSTAB or return "Can't write fstab: $!"; # well, cases when close fails are rare but still exist
+        return 0;
+}
+
+
+=head2 generate_user_grub_conf
+
+Generate grub config file menu.lst based upon user provided precondition.
+
+@param string - name of the root partition
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub generate_user_grub_conf
+{
+        my ($self, $device_file) = @_;
+        my $mount_point=$self->cfg->{paths}{base_dir};
+        my $conf_string=$self->cfg->{grub};
+
+	my $partition_number = $self->get_partition_number($device_file);
+	my ($error, $grub_device) = $self->get_grub_device( $device_file);
+        return $grub_device if $error;
+
+        $conf_string =~ s/\$root/$device_file/g;
+        $conf_string =~ s/\$grubroot/(hd$grub_device,$partition_number)/g;
+
+        return $self->write_menu_lst($conf_string, "truncate");
+}
+
+
+=head2 generate_grub_menu_lst
+
+Create a grub config file (menu.lst) based on the options in the configuration
+hash. The function is mainly a wrapper for create_menu_lst_entry and
+create_new_menu_lst.
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub generate_grub_menu_lst
+{
+        my ($self) = @_;
+        my $retval;
+
+        my $partition = $self->images->[0]->{partition};
+
+        if ($self->cfg->{grub}) {
+                return $retval if $retval = $self->generate_user_grub_conf($partition);
+        } else {
+                return $retval if $retval = $self->create_new_menu_lst();
+                return $retval if $retval = $self->create_menu_lst_entry($partition);
+        }
+	return 0;
+}
+
+
+=head2 prepare_boot
+
+Make installed system ready for boot from hard disk.
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub prepare_boot
+{
+        my ($self) = @_;
+        my $retval = 0;
+        return $retval if $retval = $self->configure_fstab();
+        return $retval if $retval = $self->generate_grub_menu_lst( );
+	return $retval if $retval = $self->generate_pxe_grub();
+# 	return $retval if $retval = $self->copy_menu_lst();
+        return 0;
+}
+
 
 =head2 get_device
 
@@ -96,34 +245,6 @@ sub get_partition_label
 }
 
 
-=head2 configure_fstab
-
-Write fstab on installed system based upon the installed images and
-partitions.
-
-@return success - 0
-@return error   - error string
-
-=cut
-
-sub configure_fstab
-{
-        my ($self) = @_;
-	# Creates fstab-entry for the final partition
-
-        $self->log->debug("Configuring fstab to contain installed images");
-        open (my $FSTAB, ">>", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
-
-        # write defaults for fstab
-        print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tnoauto\t0 0\n";
-
-        foreach my $image (@{$self->cfg->{images}}) {
-                print $FSTAB $image->{partition},"\t",$image->{mount},"\text3\tdefaults\t1 1\n";
-        }
-
-        close $FSTAB or return "Can't write fstab: $!"; # well, cases when close fails are rare but still exist
-        return 0;
-}
 
 =head2 generate_pxe_grub
 
@@ -183,83 +304,6 @@ sub copy_menu_lst
         return $self->log_and_exec("cp $menu_lst_file $tapper_conf/$hostname.lst");
 }
 
-=head2 get_grub_device
-
-Get the disc part of grub notation of a given device file eg. /dev/hda1.
-
-@param string - device file name
-
-@return success - (0, grub device notation)
-@return eror    - (1, error string)
-
-=cut
-
-sub get_grub_device
-{
-        my ($self, $device_file) = @_;
-        (my $grub_search_string = $device_file) =~ s/[0-9]//g;
-        my $mount_point=$self->cfg->{paths}{base_dir};               # root partition will always be mounted there
-        my ($error,$grub_device) = $self->log_and_exec("/usr/sbin/grub-install","--recheck",
-                                                       "--root-directory=$mount_point --no-floppy $device_file | grep $grub_search_string");
-        return ($error,$grub_device) if $error;
-        $grub_device =~ s/[a-z()\/ \s]//g;
-	if ($grub_device eq "") {
-                $self->log->warn( "Grub device not found, took '0'");
-                $grub_device = 0;
-  	}
-	return (0,$grub_device);
-}
-
-
-=head2 get_partition_number
-
-Get the partition part of grub notation of a given device file eg. /dev/hda1.
-
-@param string - partition number
-
-@return int - grub device notation
-
-=cut
-
-sub get_partition_number
-{
-        my ($self, $device_file) = @_;
-	(my $partition_number = $device_file) =~ s/[a-z\/]//g;
-	$partition_number--;
-	return $partition_number;
-}
-
-=head2 generate_grub_menu_lst
-
-Create a grub config file (menu.lst) based on the options in the configuration
-hash. The function is mainly a wrapper for create_menu_lst_entry and
-create_new_menu_lst.
-
-@return success - 0
-@return error   - error string
-
-=cut
-
-sub generate_grub_menu_lst
-{
-        my ($self) = @_;
-        my $retval;
-
-        return("First precondition is not the root image")
-          if not $self->cfg->{preconditions}->[0]->{precondition_type} eq 'image'
-            and $self->cfg->{preconditions}->[0]->{mount} eq '/';
-
-        # XXX: use $self->images->[0] and check whether this is correct
-        my $partition = $self->cfg->{preconditions}->[0]->{partition};
-
-        if ($self->cfg->{grub}) {
-                return $retval if $retval = $self->generate_user_grub_conf($partition);
-        } else {
-                return $retval if $retval = $self->create_new_menu_lst();
-                return $retval if $retval = $self->create_menu_lst_entry($partition);
-        }
-	return 0;
-}
 
 =head2 create_menu_lst_entry
 
@@ -392,56 +436,6 @@ sub install
 
         $self->log->debug("Image copied successfully");
 
-        return 0;
-}
-
-
-=head2 generate_user_grub_conf
-
-Generate grub config file menu.lst based upon user provided precondition.
-
-@param string - name of the root partition
-
-@return success - 0
-@return error   - error string
-
-=cut
-
-sub generate_user_grub_conf
-{
-        my ($self, $device_file) = @_;
-        my $mount_point=$self->cfg->{paths}{base_dir};
-        my $conf_string=$self->cfg->{grub};
-
-	my $partition_number = $self->get_partition_number($device_file);
-	my ($error, $grub_device) = $self->get_grub_device( $device_file);
-        return $grub_device if $error;
-
-        $conf_string =~ s/\$root/$device_file/g;
-        $conf_string =~ s/\$grubroot/(hd$grub_device,$partition_number)/g;
-
-        return $self->write_menu_lst($conf_string, "truncate");
-}
-
-
-
-=head2 prepare_boot
-
-Make installed system ready for boot from hard disk.
-
-@return success - 0
-@return error   - error string
-
-=cut
-
-sub prepare_boot
-{
-        my ($self) = @_;
-        my $retval = 0;
-        return $retval if $retval = $self->configure_fstab();
-        return $retval if $retval = $self->generate_grub_menu_lst( );
-	return $retval if $retval = $self->generate_pxe_grub();
-# 	return $retval if $retval = $self->copy_menu_lst();
         return 0;
 }
 
