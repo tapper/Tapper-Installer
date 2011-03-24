@@ -111,7 +111,7 @@ sub configure_fstab
         my ($self) = @_;
 	# Creates fstab-entry for the final partition
 
-        print STDERR "Tapper::Installer::Precondition::Image.configure_fstab()\n";
+        $self->log->debug("Configuring fstab to contain installed images");
         open (my $FSTAB, ">>", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
 
         # write defaults for fstab
