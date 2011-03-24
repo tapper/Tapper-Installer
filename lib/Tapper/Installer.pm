@@ -3,7 +3,6 @@ package Tapper::Installer;
 use strict;
 use warnings;
 
-use Method::Signatures;
 use Moose;
 use Socket;
 use YAML::Syck;
@@ -29,11 +28,11 @@ has cfg => (is      => 'rw',
             default => sub { {server=>undef, port => 1337} },
            );
 
-method BUILD($config) 
+sub BUILD
 {
+        my ($self, $config) = @_;
         $self->{cfg}=$config;
-};
-
+}
 
 
 =head2 mcp_inform
@@ -47,11 +46,12 @@ Tell the MCP server our current status. This is done using a TCP connection.
 
 =cut
 
-method mcp_inform($msg)
+sub mcp_inform
 {
+        my ($self, $msg) = @_;
         my $message = {state => $msg};
         return $self->mcp_send($message);
-};
+}
 
 
 
@@ -94,15 +94,16 @@ Tell the MCP server our current status, then die().
 =cut
 
 
-method logdie($msg)
+sub logdie
 {
+        my ($self, $msg) = @_;
         if ($self->cfg->{mcp_host}) {
                 $self->mcp_send({state => 'error-install', error => $msg});
         } else {
                 $self->log->error("Can't inform MCP, no server is set");
         }
         die $msg;
-};
+}
 
 1;
 
