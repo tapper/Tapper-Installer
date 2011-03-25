@@ -62,13 +62,14 @@ $mock_image->mock('makedir', sub{return(0)});
 $mock_image->unmock('makedir');
 
 for (my $i = 1; $i <= 3; $i++) {
-        $precondition->{mount} = "/mount$i";
-        $retval = $image_installer->install($precondition);
+        my %precondition = %$precondition;
+        $precondition{mount} = "/mount$i";
+        $retval = $image_installer->install(\%precondition);
         is($retval, 0, "Install one image without actual image part ($i)");
 }
 
 # get a list of images that don't have $basedir.$mount as mount value
-my @wrong_mounts =  grep{$_->{mount} !~ m|$tempdir/mount\d|} @{$image_installer->images};
+my @wrong_mounts =  grep{$_->{mount} !~ m|/mount\d|} @{$image_installer->images};
 is_deeply(\@wrong_mounts, [], 'Mounts saved in $self->images');
 
 my @results;
