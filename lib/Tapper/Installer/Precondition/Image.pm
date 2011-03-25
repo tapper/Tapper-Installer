@@ -430,9 +430,7 @@ sub install
                 return $retval if $retval;
         }
 
-        my %image = %$image; # keep a changed version but don't change the original precondition
-        $image{mount} = $mount_point;
-        $self->images([ @{$self->images}, \%image ]);
+        $self->images([ @{$self->images}, $image ]);
 
         $self->log->debug("Image copied successfully");
 
@@ -516,7 +514,6 @@ sub install_image_iso
         my $retval;
         return $retval if $retval=$self->log_and_exec("dd if=$image_file of=$device_file");
         return $retval if $retval=$self->log_and_exec("mount $device_file $mount_point");
-        $self->images([ @{$self->images}, $mount_point ]);
 
         return(0);
 }
@@ -549,7 +546,6 @@ sub install_image_tar
         my $retval;
         return $retval if $retval=$self->log_and_exec("mkfs.ext3 -q -L $partition_label $device_file");
         return $retval if $retval=$self->log_and_exec("mount $device_file $mount_point");
-        $self->images([ @{$self->images}, $mount_point ]);
 
         return $retval if $retval=$self->log_and_exec("tar xf $image_file -C $mount_point");
         return 0;
@@ -581,7 +577,6 @@ sub install_image_gz
         my $retval;
         return $retval if $retval=$self->log_and_exec("mkfs.ext3 -q -L $partition_label $device_file");
         return $retval if $retval=$self->log_and_exec("mount $device_file $mount_point");
-        $self->images([ @{$self->images}, $mount_point ]);
 
         return $retval if $retval=$self->log_and_exec("tar xfz $image_file -C $mount_point");
         return 0;
@@ -613,7 +608,6 @@ sub install_image_bz2
         my $retval;
         return $retval if $retval=$self->log_and_exec("mkfs.ext3 -q -L $partition_label $device_file");
         return $retval if $retval=$self->log_and_exec("mount $device_file $mount_point");
-        $self->images([ @{$self->images}, $mount_point ]);
 
         return $retval if $retval=$self->log_and_exec("tar xfj $image_file -C $mount_point");
         return 0;
@@ -658,8 +652,9 @@ order.
 sub unmount
 {
         my ($self) = @_;
+        my $basedir = $self->cfg->{paths}{base_dir};
         foreach my $image (reverse @{$self->images}) {
-                my $mount = $image->{mount};
+                my $mount = $basedir.$image->{mount};
                 next unless -d $mount;
                 $self->log_and_exec('umount', $mount);
         }
