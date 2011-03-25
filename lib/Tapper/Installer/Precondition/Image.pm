@@ -83,7 +83,7 @@ sub configure_fstab
 	# Creates fstab-entry for the final partition
 
         $self->log->debug("Configuring fstab to contain installed images");
-        open (my $FSTAB, ">>", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
+        open (my $FSTAB, ">", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
 
         # write defaults for fstab
         print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tnoauto\t0 0\n";
