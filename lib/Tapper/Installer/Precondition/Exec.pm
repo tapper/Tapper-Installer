@@ -64,8 +64,8 @@ sub install
         @options = @{$exec->{options}} if $exec->{options};
 
         if ($exec->{filename}) {
-                $command = $self->cfg->{paths}{base_dir}.$exec->{filename};
-                return("$command is not an executable") if not -x $command;
+                $command = $exec->{filename};
+                return("$command is not an executable") if not -x $self->cfg->{paths}{base_dir}.$command;
         }
 
         $self->log->debug("executing $command with options ",join (" ",@options));
