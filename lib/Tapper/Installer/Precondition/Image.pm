@@ -37,7 +37,7 @@ Get the partition part of grub notation of a given device file eg. /dev/hda1.
 sub get_partition_number
 {
         my ($self, $device_file) = @_;
-	my ($partition_number) = $device_file) =~ m/(\d+)/;
+	my ($partition_number) = $device_file =~ m/(\d+)/;
 	$partition_number--;
 	return $partition_number;
 }
@@ -56,8 +56,8 @@ Get the disc part of grub notation of a given device file eg. /dev/hda1.
 sub get_grub_device
 {
         my ($self, $device_file) = @_;
-        my ($grub_devive) = $device_file =~ m/[hs]d([a-z])/;
-        $grub_devive      =~ tr/[a-i]/[0-9]/;
+        my ($grub_device) = $device_file =~ m/[hs]d([a-z])/;
+        $grub_device      =~ tr/[a-j]/[0-9]/;
 	if ($grub_device eq "") {
                 $self->log->warn( "Grub device not found, took '0'");
                 $grub_device = 0;
