@@ -1,4 +1,4 @@
-#!/opt/tapper/bin/perl
+#! perl
 
 use warnings;
 use strict;
