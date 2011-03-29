@@ -13,7 +13,7 @@ STARTSCRIPT=
 FILENAME="tapper-automatic-test.pl"
 POSSIBLE_PATHS="
 /mnt/opt/tapper/bin/
-/opt/tapper/bin/
+/opt/tapper/perls/current/bin/
 /home/tapper/perl510/bin/
 "
 for(( i=0; i<10; i++)) 
