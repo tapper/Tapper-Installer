@@ -56,6 +56,9 @@ Get the disc part of grub notation of a given device file eg. /dev/hda1.
 sub get_grub_device
 {
         my ($self, $device_file) = @_;
+        my $basedir = $self->cfg->{paths}{base_dir};
+        my $error = $self->log_and_exec("/usr/sbin/grub-install","--recheck",
+                                        "--root-directory=$basedir","--no-floppy","$device_file");
         my ($grub_device) = $device_file =~ m/[hs]d([a-z])/;
         $grub_device      =~ tr/[a-j]/[0-9]/;
 	if ($grub_device eq "") {
