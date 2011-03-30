@@ -1,8 +1,16 @@
-2011-03-28  Steffen Schwigon  <steffen.schwigon@amd.com>
+2011-03-30 Steffen Schwigon <steffen.schwigon@amd.com>
 
 	* v3.0.5
 
-	* utils get rewritten shebang line
+	* rewritable shebang line
+	* [FIX] call grub-install again
+	* [TEST] adapted to new $self->images layout
+	* [FIX] don't use basedir in elements of $self->images
+	* [FIX] write fstab new to get rid of old entries
+	* [FIX] do not prepend Exec command with basedir
+	* [RFK] get rid of Method::Signatures
+	* [TEST] detect nonexisting image
+	* [FIX] log using Log4perl
 
 2011-03-10 Steffen Schwigon <steffen.schwigon@amd.com>
 
