@@ -376,7 +376,7 @@ and testability.
 sub write_menu_lst
 {
         my ($self, $content, $truncate) = @_;
-	$self->makedir('/boot/grub/');
+	$self->makedir($self->cfg->{paths}{base_dir}."/boot/grub/");
 	my $menu_lst_file = $self->cfg->{paths}{base_dir}."/boot/grub/menu.lst";
         my $mode = '>>';
         if ($truncate) {
