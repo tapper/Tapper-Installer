@@ -633,7 +633,7 @@ Install an image to a given partition and mount it to a given mount point.
 sub copy_image
 {
         my ($self, $device_file, $image_file, $mount_point) = @_;
-        $image_file = $self->cfg->{paths}{image_dir}.$image_file if not -e $image_file;
+        $image_file = $self->cfg->{paths}{image_dir}.$image_file unless $image_file =~m(^/); 
 
 	# Image exists?
         if (not -e $image_file) {
