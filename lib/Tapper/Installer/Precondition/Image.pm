@@ -89,7 +89,8 @@ sub configure_fstab
         open (my $FSTAB, ">", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
 
         # write defaults for fstab
-        print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tnoauto\t0 0\n";
+        print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tauto\t0 0\n";
+	print $FSTAB "/data/tapper tapper:/data/tapper nfs noauto,vers=3 0 0\n";
 
         foreach my $image (@{$self->images}) {
                 print $FSTAB $image->{partition},"\t",$image->{mount},"\text3\tdefaults\t1 1\n";
