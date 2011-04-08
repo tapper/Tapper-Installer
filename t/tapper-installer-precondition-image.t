@@ -84,7 +84,7 @@ for (my $i = 3; $i >= 1; $i--) {
 $precondition->{image} = '/this/image/does/not/exists.tgz';
 
 $retval = $image_installer->install($precondition);
-is($retval, "Image ".$config->{paths}{image_dir}."/this/image/does/not/exists.tgz could not be found", 'Install nonexisting image');
+is($retval, "Image "."/this/image/does/not/exists.tgz could not be found", 'Install nonexisting image');
 
 
 
