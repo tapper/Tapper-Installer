@@ -86,8 +86,8 @@ method install_local($file) {
         return $retval if $retval = $self->makedir($dest_path);
 
         $self->log->debug("Copying ".$file->{name}." to $dest_path$dest_filename");
-        system("cp","--sparse=always","-r","-L",$file->{name},$dest_path.$dest_filename) == 0 
-          or return "Can't copy ".$file->{name}." to $dest_path$dest_filename:$!";
+        my ($error, $message) = $self->log_and_exec("cp","--sparse=always","-r","-L",$file->{name},$dest_path.$dest_filename);
+        return "Can't copy ".$file->{name}." to $dest_path$dest_filename:$message" if $error;
 
 	return(0);
 };
