@@ -9,28 +9,27 @@ depend() {
 start() {
         ebegin "(gentoo) Starting tapper program run control"
 
-#needed for NFS
+        #needed for NFS
         /etc/init.d/portmap start
 
         STARTSCRIPT=
         FILENAME="tapper-automatic-test.pl"
         POSSIBLE_PATHS="
-/mnt/opt/tapper/bin/
-/opt/tapper/bin/
-/home/tapper/perl510/bin/
+/mnt/opt/tapper/perl/perls/current/bin/
+/opt/tapper/perl/perls/current/bin/
 "
         while (( 1 )); do
             for DIR in $POSSIBLE_PATHS; do
                 STARTSCRIPT=${DIR}/$FILENAME
                 if [[ -e $STARTSCRIPT ]]
                 then
+                    # show network configuration so we can log into virtualisation guest
                     /sbin/ifconfig
+
                     ${DIR}/perl $STARTSCRIPT $*
                     exit 0
                 fi
             done
-            mount natrium:/vol/osrc_home/ /home
-            echo "Wait for auto mount /home/tapper ..."
             sleep 2
         done
 

@@ -11,40 +11,34 @@
 # chkconfig: 35 99 99
 # description: (suse) Start tapper program run control
 
-# ss5 sschwigo 2008-09-29 TODO: that's a dirty hack
-# mount natrium:/vol/osrc_home/ /home
+# do not execute again at shutdown
+if ( test "$1" = 'stop' ); then
+    exit 0
+fi
 
-#needed for NFS
+#needed for NFS, some OS fail to load it
 if [[ -e /etc/init.d/portmap ]]
 then
 	/etc/init.d/portmap start
 fi
 
-
 STARTSCRIPT=
 FILENAME="tapper-automatic-test.pl"
 POSSIBLE_PATHS="
-/mnt/opt/tapper/bin/
-/opt/tapper/perls/current/bin/
-/home/tapper/perl510/bin/
+/opt/tapper/perl/perls/current/bin/
+/mnt/opt/tapper/perl/perls/current/bin/
 "
 
-for(( i=0; i<10; i++)) 
-do
-    ping -c1 bancroft > /dev/null && break
-    echo "wait for network available..."
-    sleep 2
-done
-
-
-mount natrium:/vol/osrc_home/ /home
+# Some guest images have /opt/tapper mounted to /mnt/opt/tapper
+# without a symlink. Make sure Tapper also works there.
 for DIR in $POSSIBLE_PATHS; do
     STARTSCRIPT=${DIR}/$FILENAME
     if [[ -e $STARTSCRIPT ]]
     then
+        # show network configuration so we can log into virtualisation guest
         /sbin/ifconfig
+
         ${DIR}/perl $STARTSCRIPT $*
         exit 0
     fi
 done
-
