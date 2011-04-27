@@ -176,12 +176,13 @@ sub make_initrd
                 }
 
                 my @files = sort younger </boot/vmlinuz-*>;
-                if (@files and $files[0] =~/vmlinuz-(.*)/) {
-                        $kernel_file = "vmlinuz-$1";
+                if (@files) {
+                        $kernel_file   = $files[0];
+                        $kernelversion = $1;
                         last;
                 }
                 my $filename;
-                $filename = join("/tmp/bootdir-content");
+                $filename = "/tmp/bootdir-content";
                 system("ls -l /boot/ > $filename");
                 return "kernel install failed, can not find new kernel";
         }}
