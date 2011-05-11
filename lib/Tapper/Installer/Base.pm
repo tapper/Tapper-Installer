@@ -166,8 +166,10 @@ method system_install($state)
         $self->logdie("can't get local data: $config") if ref $config ne "HASH";
 
         my $net = Tapper::Remote::Net->new($config);
-        $retval = $net->nfs_mount() unless $state eq 'simnow';
-        $self->logdie($retval) if $retval;
+        if (not $state eq 'simnow') {
+                $retval = $net->nfs_mount();
+                $self->log->warn($retval) if $retval;
+        }
 
         $self->log->info("Installing testrun (".$self->cfg->{testrun_id}.") on host ".$self->cfg->{hostname});
         $self->mcp_inform("start-install") unless $state eq "autoinstall";
