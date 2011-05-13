@@ -5,7 +5,7 @@ use warnings;
 
 use Moose;
 use Socket;
-use YAML::Syck;
+use Mojo::Util qw/url_escape/;
 
 extends 'Tapper::Base';
 with 'MooseX::Log::Log4perl';
@@ -73,11 +73,16 @@ sub mcp_send
         my $port   = $self->cfg->{mcp_port} || 7357;
         $message->{testrun_id} ||= $self->cfg->{testrun_id};
 
-        my $yaml = Dump($message);
+        my $url = "/";
+        foreach my $key (keys %$message) {
+                url_escape $message->{$key};
+        }
+        $url   .= join "/", "state",$message->{state}, %$message;
+
 	if (my $sock = IO::Socket::INET->new(PeerAddr => $server,
 					     PeerPort => $port,
 					     Proto    => 'tcp')){
-		print $sock ("$yaml");
+		$sock->print("GET $url HTTP/1.0\r\n\r\n");
 		close $sock;
 	} else {
                 return("Can't connect to MCP: $!");
