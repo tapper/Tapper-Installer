@@ -39,7 +39,7 @@ sub BUILD
 
 Tell the MCP server our current status. This is done using a TCP connection.
 
-@param string - message to send to MCP
+@param hash ref - message to send to MCP
 
 @return success - 0
 @return error   - -1
@@ -59,7 +59,7 @@ sub mcp_inform
 
 Tell the MCP server our current status. This is done using a TCP connection.
 
-@param string - message to send to MCP
+@param hash ref - message to send to MCP
 
 @return success - 0
 @return error   - error string
