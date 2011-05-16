@@ -30,7 +30,7 @@ requires 'File::Path';
 requires 'File::Type';
 requires 'Hash::Merge::Simple';
 requires 'File::ShareDir';
-
+requires 'URI::Escape';
 requires 'Daemon::Daemonize';    # for simnow installer
 requires 'IPC::Open3';
 requires 'IO::Select';

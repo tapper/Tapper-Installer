@@ -5,7 +5,7 @@ use warnings;
 
 use Moose;
 use Socket;
-use Mojo::Util qw/url_escape/;
+use URI::Escape "uri_escape";
 
 extends 'Tapper::Base';
 with 'MooseX::Log::Log4perl';
@@ -75,7 +75,7 @@ sub mcp_send
 
         my $url = "/";
         foreach my $key (keys %$message) {
-                url_escape $message->{$key};
+                uri_escape $message->{$key};
         }
         $url   .= join "/", "state",$message->{state}, %$message;
 
