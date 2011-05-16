@@ -38,6 +38,8 @@ requires 'List::Util';
 requires 'Log::Log4perl';
 requires 'Method::Signatures';
 requires 'Moose';
+requires 'Mojo::Util';
+
 
 requires 'YAML' => "0.72";
 requires 'YAML::Syck' => "1.17";
