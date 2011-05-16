@@ -75,7 +75,7 @@ sub mcp_send
 
         my $url = "/";
         foreach my $key (keys %$message) {
-                uri_escape $message->{$key};
+                $message->{$key} = uri_escape($message->{$key});
         }
         $url   .= join "/", "state",$message->{state}, %$message;
 
