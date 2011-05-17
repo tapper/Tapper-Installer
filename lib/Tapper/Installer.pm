@@ -5,7 +5,7 @@ use warnings;
 
 use Moose;
 use Socket;
-use Mojo::Util qw/url_escape/;
+use URI::Escape;
 
 extends 'Tapper::Base';
 with 'MooseX::Log::Log4perl';
@@ -72,23 +72,40 @@ sub mcp_send
         my $server = $self->cfg->{mcp_host} or return "MCP host unknown";
         my $port   = $self->cfg->{mcp_port} || 7357;
         $message->{testrun_id} ||= $self->cfg->{testrun_id};
+        my %headers;
 
-        my $url = "/";
+        my $url = "GET /state/";
+        
+        # state always needs to be first URL part because server uses it as filter
+        $url   .= $message->{state} || 'unknown';
+        delete $message->{state};
+
         foreach my $key (keys %$message) {
-                url_escape $message->{$key};
+                if ($message->{$key} =~ m|/| ) {
+                        $headers{$key} = $message->{$key};
+                } else {
+                        $url .= "/$key/";
+                        $url .= uri_escape($message->{$key});
+                }
         }
-        $url   .= join "/", "state",$message->{state}, %$message;
+        $url .= " HTTP/1.0\r\n";
+        foreach my $header (keys %headers) {
+                $url .= "X-Tapper-$header: ";
+                $url .= $headers{$header};
+                $url .= "\r\n";
+        }
 
 	if (my $sock = IO::Socket::INET->new(PeerAddr => $server,
 					     PeerPort => $port,
 					     Proto    => 'tcp')){
-		$sock->print("GET $url HTTP/1.0\r\n\r\n");
+		$sock->print("$url\r\n");
 		close $sock;
 	} else {
                 return("Can't connect to MCP: $!");
 	}
         return(0);
 }
+
 
 =head2  logdie
 
