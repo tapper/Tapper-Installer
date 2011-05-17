@@ -5,7 +5,7 @@ use warnings;
 
 use Moose;
 use Socket;
-use URI::Escape;
+use URI::Escape "uri_escape";
 
 extends 'Tapper::Base';
 with 'MooseX::Log::Log4perl';
