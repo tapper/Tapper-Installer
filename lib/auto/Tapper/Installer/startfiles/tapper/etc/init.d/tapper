@@ -1,6 +1,15 @@
 #!/bin/sh
 
-# show IP addressed of all active network cards. This is the easiest way to do it.
+### BEGIN INIT INFO
+# Required-Start: $ALL $network $remote_fs $syslog $xend
+# Provides: tapper
+# Default-Start: 3 5 
+# Default-Stop: 1 6
+# Required-Stop:
+# Description: (suse) Start tapper program run control
+### END INIT INFO
+# chkconfig: 35 99 99
+# description: (suse) Start tapper program run control
 
 # do not execute again at shutdown
 if ( test "$1" = 'stop' ); then
@@ -33,5 +42,3 @@ for DIR in $POSSIBLE_PATHS; do
         exit 0
     fi
 done
-
-
