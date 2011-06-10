@@ -25,7 +25,7 @@ Tapper::Installer - Tapper - Install everything needed for a test
 =cut
 
 has cfg => (is      => 'rw',
-            default => sub { {server=>undef, port => 1337} },
+            default => sub { {} },
            );
 
 sub BUILD
@@ -70,7 +70,7 @@ sub mcp_send
 {
         my ($self, $message) = @_;
         my $server = $self->cfg->{mcp_host} or return "MCP host unknown";
-        my $port   = $self->cfg->{mcp_port} || 7359;
+        my $port   = $self->cfg->{mcp_port} or return "MCP port unknown";
         $message->{testrun_id} ||= $self->cfg->{testrun_id};
         my %headers;
 
