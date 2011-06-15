@@ -233,6 +233,7 @@ sub install
 	$self->log->debug("Installing kernel from $git_url $git_rev");
 
         my $git_path   = qx(which git);
+        chomp $git_path;
         return "Can not find git. Git_path is '$git_path'" if not -e $git_path;
 
 	pipe (my $read, my $write);
