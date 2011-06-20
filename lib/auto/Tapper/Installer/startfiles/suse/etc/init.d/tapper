@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ### BEGIN INIT INFO
 # Required-Start: $ALL $network $remote_fs $syslog $xend
