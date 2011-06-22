@@ -120,7 +120,7 @@ sub install_startscript
 		
                         my $ret = 0;
                         my ($error, $retval);
-                        if ($distro=~m/suse/) {
+                        if ($distro=~m/suse|debian/) {
                                 ($error, $retval)=$self->log_and_exec("insserv","/etc/init.d/tapper");
                         } elsif ($distro=~m/(redhat)|(fedora)/) {
                                 ($error, $retval)=$self->log_and_exec("chkconfig","--add","tapper"); 
@@ -273,7 +273,7 @@ sub get_distro
                 close $fh;
                 my $distro;
                 ($distro) = $issue =~ m/(Debian)/;
-                return $distro if $distro;
+                return lc($distro) if $distro;
         }
 	return "";
 }
