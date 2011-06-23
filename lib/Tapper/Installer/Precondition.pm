@@ -170,13 +170,13 @@ method guest_install($sub, $partition, $image)
         return "can only be called from an object" if not ref($self);
         $image = $self->cfg->{paths}{base_dir}.$image;
         my ($error, $loop);
+        $self->makedir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
 
         my $retval;
         if ($image and $partition) {
                 # make sure loop device is free
                 # don't use losetup -f, until it is available on installer NFS root
                 $self->log_and_exec("losetup -d /dev/loop0"); # ignore error since most of the time device won't be already bound
-                $self->makedir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
                 return $retval if $retval = $self->log_and_exec("losetup /dev/loop0 $image");
                 return $retval if $retval = $self->log_and_exec("kpartx -a /dev/loop0");
                 return $retval if $retval = $self->log_and_exec("mount /dev/mapper/loop0$partition ".$self->cfg->{paths}{guest_mount_dir});
