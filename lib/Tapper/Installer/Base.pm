@@ -6,7 +6,6 @@ use Moose;
 use common::sense;
 
 use Tapper::Remote::Config;
-use Tapper::Remote::Net;
 use Tapper::Installer::Precondition::Copyfile;
 use Tapper::Installer::Precondition::Exec;
 use Tapper::Installer::Precondition::Fstab;
@@ -165,9 +164,8 @@ method system_install($state)
         $self->{cfg}=$config;
         $self->logdie("can't get local data: $config") if ref $config ne "HASH";
 
-        my $net = Tapper::Remote::Net->new($config);
         if (not $state eq 'simnow') {
-                $retval = $net->nfs_mount();
+                $retval = $self->nfs_mount();
                 $self->log->warn($retval) if $retval;
         }
 
