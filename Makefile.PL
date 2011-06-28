@@ -23,7 +23,7 @@ build_requires 'File::Temp';
 build_requires 'Cwd';
 
 
-requires 'Tapper::Remote' => "3.000010";
+requires 'Tapper::Remote' => "3.000011";
 requires 'Tapper::Base' => "3.000010";
 requires 'File::Basename';
 requires 'File::Path';
