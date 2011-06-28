@@ -6,7 +6,6 @@ use warnings;
 use Hash::Merge::Simple 'merge';
 use File::Type;
 use File::Basename;
-use Method::Signatures;
 use Moose;
 use Socket;
 use Sys::Hostname;
@@ -43,9 +42,9 @@ the above mentioned types, just set the suffix of the file accordingly.
 
 =cut
 
-method get_file_type($file)
+sub get_file_type
 {
-
+        my ($self, $file) = @_;
         my @file_split=split(/\./,$file);
         my $type=$file_split[-1];
         if ($type eq "iso") {
@@ -84,7 +83,7 @@ method get_file_type($file)
         } else {
                 return(1, "$file is of unrecognised file type \"$type\"");
         }
-};
+}
 
 
 
@@ -100,8 +99,9 @@ hostname is set to the DNS hostname associated to this IP address.
 
 =cut
 
-method gethostname
+sub gethostname
 {
+        my ($self) = @_;
 	my $hostname = Sys::Hostname::hostname();
 	if ($hostname   =~ m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) {
                 ($hostname) = gethostbyaddr(inet_aton($hostname), AF_INET) or ( print("Can't get hostname: $!") and exit 1);
@@ -109,7 +109,7 @@ method gethostname
                 system("hostname", "$hostname");
         }
 	return $hostname;
-};
+}
 
 
 =head2 log_and_exec
@@ -129,8 +129,9 @@ the output of the command.
 
 =cut
 
-method log_and_exec(@cmd)
+sub log_and_exec
 {
+        my ($self, @cmd) = @_;
         my $cmd = join " ",@cmd;
 	$self->log->debug( $cmd );
         my $output=`$cmd 2>&1`;
@@ -147,27 +148,31 @@ method log_and_exec(@cmd)
         return (0, $output) if wantarray;
         return 0;
 }
-;
+
 
 
 =head2 guest_install
 
-Execute a command given as first parameter inside the partition given as
-second parameter which may be inside the image file given as third
-parameter or a device name (in which case the third arguement has to be undef)
+Install a precondition inside a virtualisation guest. A guest can be
+given as image, partition or directory. This function makes the
+necessary preparations, calls the right precondition install function
+and cleans up afterwards. An image can be given as file name and
+partition or file name only. The later is supposed to be an image file
+containing just one partition.
 
-@param sub    - execute this function with base dir set to mounted image file
-@param string - partition number to mount inside the image
-@param string - (optional) image file path
+@param sub      - execute this function with base dir set to mounted image file
+@param hash ref - define where to run the command
 
 @return success - 0
 @return error   - error string
 
 =cut
 
-method guest_install($sub, $partition, $image)
+sub guest_install
 {
+        my ($self, $sub, $partition, $image) = @_;
         return "can only be called from an object" if not ref($self);
+
         $image = $self->cfg->{paths}{base_dir}.$image;
         my ($error, $loop);
         $self->makedir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
@@ -218,7 +223,7 @@ method guest_install($sub, $partition, $image)
         }
 
         return 0;
-};
+}
 
 
 =head2 file_save
@@ -233,8 +238,9 @@ Save output as file for MCP to find it and upload it to reports receiver.
 
 =cut
 
-method file_save($output, $filename)
+sub file_save
 {
+        my ($self, $output, $filename) = @_;
         my $testrun_id = $self->cfg->{test_run};
         my $destdir = $self->cfg->{paths}{output_dir}."/$testrun_id/install/";
         my $destfile = $destdir."/$filename";
@@ -245,7 +251,7 @@ method file_save($output, $filename)
           or return ("Can't open $destfile:$!");
         print $FH $output;
         close $FH;
-};
+}
 
 
 
