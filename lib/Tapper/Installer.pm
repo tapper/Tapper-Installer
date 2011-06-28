@@ -101,6 +101,7 @@ sub mcp_send
 		$sock->print("$url\r\n");
 		close $sock;
 	} else {
+                $self->log->error("Can't connect to MCP: $!");
                 return("Can't connect to MCP: $!");
 	}
         return(0);
