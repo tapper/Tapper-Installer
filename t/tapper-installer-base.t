@@ -115,7 +115,7 @@ $retval = $base->precondition_install($precondition, $copyfile);
 is($retval, 0, 'Installation into partition without errors');
 is_deeply(\@commands, 
           [
-           ["cp","--sparse=always","-r","-L","t/misc/packages/debian_package_test.deb","$tempdir/non/exist/somefile"],
+           ["cp","--sparse=always","-r","-L",$package_file,"$tempdir/non/exist$destfile"],
           ], "Guest install into directory"
          );
 
