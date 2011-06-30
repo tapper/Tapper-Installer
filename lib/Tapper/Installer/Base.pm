@@ -113,30 +113,29 @@ function smaller and thus more readable.
 
 method precondition_install($precondition, $inst_obj)
 {
-        # guest in given partition, can be a /dev/partition or a partition in a rawimage file
-        if ($precondition->{mountpartition}) {
-                my $mountfile;
-                $mountfile = $precondition->{mountfile} if $precondition->{mountfile};
-                # $obj is given to the anonymous sub when the sub is called inside guest_install.
-                # This is the way to get an appropriate object with correctly set base directory.
-                # $precondition on the other hand is set in here and the sub carries it to guest_install.
-                return $inst_obj->guest_install(sub{
-                                                        my ($obj) = @_;
-                                                        $obj->install($precondition);
-                                                },
-                                                $precondition->{mountpartition},
-                                                $mountfile);
+        my $where;
+
+        if ($precondition->{mountfile}) {
+                $where->{mount_options}->{image}     = $precondition->{mountfile};
+                if ( $precondition->{mountpartition} ) {
+                        $where->{mount_target}               = 'image_partition';
+                        $where->{mount_options}->{partition} = $precondition->{mountpartition};
+                } else {
+                        $where->{mount_target}       = 'image_flat';
+                }
         }
-        # guest in given raw image file without partitions
-        elsif ($precondition->{mountfile}) {
-                return $inst_obj->guest_install(sub{
-                                                        my ($obj) = @_;
-                                                        $obj->install($precondition);
-                                                },undef, $precondition->{mountfile});
+        elsif ($precondition->{mountpartition}) {
+                $where->{mount_target}               = 'partition';
+                $where->{mount_options}->{partition} = $precondition->{mountpartition};
+        }
+        elsif ($precondition->{mountdir}) {
+                $where->{mount_target}         = 'dir';
+                $where->{mount_options}->{dir} = $precondition->{mountdir};
         } else {
                 return $inst_obj->install($precondition);
         }
-        return 0;
+        return $inst_obj->guest_install( sub { shift->install($precondition) }, $where);
+
 }
 ;
 

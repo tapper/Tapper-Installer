@@ -2,6 +2,7 @@ package Tapper::Installer::Precondition;
 
 use strict;
 use warnings;
+use 5.010;
 
 use Hash::Merge::Simple 'merge';
 use File::Type;
@@ -134,56 +135,73 @@ containing just one partition.
 
 sub guest_install
 {
-        my ($self, $sub, $partition, $image) = @_;
+        my ($self, $sub, $where) = @_;
         return "can only be called from an object" if not ref($self);
 
-        $image = $self->cfg->{paths}{base_dir}.$image;
+        my $retval;
         my ($error, $loop);
         $self->makedir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
 
-        my $retval;
-        if ($image and $partition) {
-                # make sure loop device is free
-                # don't use losetup -f, until it is available on installer NFS root
-                $self->log_and_exec("losetup -d /dev/loop0"); # ignore error since most of the time device won't be already bound
-                return $retval if $retval = $self->log_and_exec("losetup /dev/loop0 $image");
-                return $retval if $retval = $self->log_and_exec("kpartx -a /dev/loop0");
-                return $retval if $retval = $self->log_and_exec("mount /dev/mapper/loop0$partition ".$self->cfg->{paths}{guest_mount_dir});
-        }
-        elsif ($image and not $partition) {
-                return $retval if $retval = $self->log_and_exec("mount -o loop $image ".$self->cfg->{paths}{guest_mount_dir});
+        # set image and partition even if they don't exist. In this case
+        # the wrong setting would be ignored
+        no warnings 'uninitialized';
+        my $new_base_dir = $self->cfg->{paths}{guest_mount_dir};
+        my $image        = $self->cfg->{paths}{base_dir}.$where->{mount_options}->{image};
+        my $partition    = $where->{mount_options}->{partition};
+        use warnings;
 
-        }
-        else
-        {
-                return $retval if $retval = $self->get_device($partition);
-                $partition = $retval;
-                return $retval if $retval = $self->log_and_exec("mount $partition ".$self->cfg->{paths}{guest_mount_dir});
+        # prepare
+        given($where->{mount_target}){
+                when('partition'){
+                        return $retval if $retval = $self->log_and_exec("mount $partition ".$new_base_dir);
+                }
+                when('image_flat'){
+                        return "No image set" if not $where->{mount_options}->{image};
+                        return $retval if $retval = $self->log_and_exec("mount -o loop $image ".$new_base_dir);
+                }
+                when('image_partition'){
+                        return "No image set" if not $where->{mount_options}->{image};
+
+                        # make sure loop device is free
+                        # don't use losetup -f, until it is available on installer NFS root
+                        $self->log_and_exec("losetup -d /dev/loop0"); # ignore error since most of the time device won't be already bound
+                        return $retval if $retval = $self->log_and_exec("losetup /dev/loop0 $image");
+                        return $retval if $retval = $self->log_and_exec("kpartx -a /dev/loop0");
+                        return $retval if $retval = $self->log_and_exec("mount /dev/mapper/loop0$partition ".$new_base_dir);
+                }
+                default   {
+                        return "Unknown mount_target ".$where->{mount_target}
+                }
         }
 
-        my $config = merge($self->cfg, {paths=> {base_dir=> $self->cfg->{paths}{guest_mount_dir}}});
+        # call
+        my $config = merge($self->cfg, {paths=> {base_dir=> $new_base_dir}});
         my $object = ref($self)->new($config);
         return $retval if $retval=$sub->($object);
 
-        if ($image and $partition) {
-                return $retval if $retval = $self->log_and_exec("umount /dev/mapper/loop0$partition");
-                return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
-                if ($retval = $self->log_and_exec("losetup -d /dev/loop0")) {
-                        sleep (2);
-                        return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
-                        return $retval if $retval = $self->log_and_exec("losetup -d /dev/loop0");
+        # cleanup
+        given($where->{mount_target}){
+                when('partition'){
+                        $retval = $self->log_and_exec("umount $new_base_dir");
+                        $self->log->error("Can not unmount $new_base_dir: $retval") if $retval;
                 }
-        }
-        else
-        {
-                $retval = $self->log_and_exec("umount ".$self->cfg->{paths}{guest_mount_dir});
-                $self->log->error("Can not unmount ".$self->cfg->{paths}{guest_mount_dir}.": $retval") if $retval;
-        }
+                when('image_flat'){
+                        $retval = $self->log_and_exec("umount $new_base_dir");
+                        $self->log->error("Can not unmount $new_base_dir: $retval") if $retval;
 
-        # seems like mount -o loop uses a loop device that is not freed at umount
-        if ($image) {
-                $self->log_and_exec("kpartx -d /dev/loop0");
-                $self->log_and_exec("losetup -d /dev/loop0");
+                        # seems like mount -o loop uses a loop device that is not freed at umount
+                        $self->log_and_exec("kpartx -d /dev/loop0");
+                        $self->log_and_exec("losetup -d /dev/loop0");
+                }
+                when('image_partition'){
+                        return $retval if $retval = $self->log_and_exec("umount /dev/mapper/loop0$partition");
+                        return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
+                        if ($retval = $self->log_and_exec("losetup -d /dev/loop0")) {
+                                sleep (2);
+                                return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
+                                return $retval if $retval = $self->log_and_exec("losetup -d /dev/loop0");
+                        }
+                }
         }
 
         return 0;
