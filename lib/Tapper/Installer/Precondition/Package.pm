@@ -42,7 +42,12 @@ sub install
 	$self->log->debug("installing $filename");
 
         my $basedir     = $self->cfg->{paths}{base_dir};
-        $basedir       .= $package->{target_directory} if $package->{target_directory}; # install into subdir
+
+        # install into subdir
+        if ($package->{target_directory}) {
+                $basedir       .= $package->{target_directory};
+                $self->makedir($basedir) if not -d $basedir;
+        }
 
         my $package_dir = '';
         $package_dir    = $self->cfg->{paths}{package_dir} unless $filename =~m(^/);
