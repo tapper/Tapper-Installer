@@ -169,7 +169,11 @@ sub guest_install
                         return $retval if $retval = $self->log_and_exec("kpartx -a /dev/loop0");
                         return $retval if $retval = $self->log_and_exec("mount /dev/mapper/loop0$partition ".$new_base_dir);
                 }
-                default   {
+                when('dir'){
+                        return "No target dir for guest installation" if not $where->{mount_options}->{dir};
+                        $new_base_dir .= $where->{mount_options}->{dir};
+                }
+                default{
                         return "Unknown mount_target ".$where->{mount_target}
                 }
         }

@@ -102,6 +102,21 @@ is_deeply(\@commands,
           ], "Guest install into partition"
          );
 
-# diag Dumper \@commands;
+@commands = ();
+# last installation may have changed precondition so we need to set it again
+$precondition = {
+                 precondition_type => 'copyfile', 
+                 name => $package_file,
+                 dest => $destfile,
+                 protocol => 'local',
+                 mountdir => '/non/exist',
+                }; 
+$retval = $base->precondition_install($precondition, $copyfile);
+is($retval, 0, 'Installation into partition without errors');
+is_deeply(\@commands, 
+          [
+           ["cp","--sparse=always","-r","-L","t/misc/packages/debian_package_test.deb","$tempdir/non/exist/somefile"],
+          ], "Guest install into directory"
+         );
 
 done_testing();
