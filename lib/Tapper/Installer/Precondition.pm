@@ -177,7 +177,7 @@ sub precondition_install
                 return $retval if $retval = $self->log_and_exec("mount $partition ".$new_base_dir);
         }
         elsif ($precondition->{mountdir}) {
-                        $new_base_dir = $self->cfg->{paths}{base_dir}.$precondition->{mountdir};
+                        $new_base_dir .= $precondition->{mountdir};
         }
 
         # call
