@@ -121,4 +121,22 @@ is_deeply(\@commands,
           ], "Guest install into directory"
          );
 
+@commands = ();
+# last installation may have changed precondition so we need to set it again
+$precondition = {
+                 precondition_type => 'copyfile',
+                 name => $package_file,
+                 dest => $destfile,
+                 protocol => 'local',
+                };
+
+$retval = $copyfile->precondition_install($precondition);
+is($retval, 0, 'Installation into partition without errors');
+is_deeply(\@commands,
+          [
+           ["cp","--sparse=always","-r","-L",$package_file,"$tempdir_base$destfile"],
+          ], "Normal install without guest"
+         );
+
+
 done_testing();
