@@ -215,9 +215,9 @@ sub precondition_install
         }
 
         # call
-        my $config = merge($self->cfg, {paths=> {base_dir=> $new_base_dir}});
-        my $object = ref($self)->new($config);
-        return $retval if $retval=$object->install($precondition);
+        my $old_basedir = $self->cfg->{paths}{base_dir};
+        $self->cfg->{paths}{base_dir} = $new_base_dir;
+        return $retval if $retval=$self->install($precondition);
 
 
         if ($precondition->{mountfile}) {
@@ -242,8 +242,10 @@ sub precondition_install
                         $retval = $self->log_and_exec("umount $new_base_dir");
                         $self->log->error("Can not unmount $new_base_dir: $retval") if $retval;
         }
+        $self->cleanup();
+        $self->cfg->{paths}{base_dir} = $old_basedir;
+        return 0;
 
-        return $self->cleanup();
 }
 
 
