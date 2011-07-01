@@ -156,10 +156,11 @@ sub precondition_install
 
         my $image;
         my $partition = $precondition->{mountpartition};
-        my $new_base_dir = $self->cfg->{paths}{guest_mount_dir};
+        my $new_base_dir = $self->cfg->{paths}{base_dir};
 
         if ($precondition->{mountfile}) {
                 $image        = $self->cfg->{paths}{base_dir}.$precondition->{mountfile};
+                $new_base_dir = $self->cfg->{paths}{guest_mount_dir};
                 if ( $precondition->{mountpartition} ) {
                         # make sure loop device is free
                         # don't use losetup -f, until it is available on installer NFS root
@@ -172,10 +173,11 @@ sub precondition_install
                 }
         }
         elsif ($precondition->{mountpartition}) {
+                $new_base_dir = $self->cfg->{paths}{guest_mount_dir};
                 return $retval if $retval = $self->log_and_exec("mount $partition ".$new_base_dir);
         }
         elsif ($precondition->{mountdir}) {
-                        $new_base_dir .= $precondition->{mountdir};
+                        $new_base_dir = $self->cfg->{paths}{base_dir}.$precondition->{mountdir};
         }
 
         # call
