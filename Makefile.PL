@@ -19,7 +19,6 @@ build_requires 'Test::Perl::Critic';
 build_requires 'Test::Fixture::DBIC::Schema';
 build_requires 'Test::MockModule';
 build_requires 'Tapper::Test' => "3.000010";
-build_requires 'File::Temp';
 build_requires 'Cwd';
 
 
@@ -28,6 +27,7 @@ requires 'Tapper::Base' => "3.000010";
 requires 'File::Basename';
 requires 'File::Path';
 requires 'File::Type';
+requires 'File::Temp';
 requires 'Hash::Merge::Simple';
 requires 'File::ShareDir';
 requires 'URI::Escape';
