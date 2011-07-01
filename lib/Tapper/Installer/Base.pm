@@ -131,11 +131,9 @@ method precondition_install($precondition, $inst_obj)
         elsif ($precondition->{mountdir}) {
                 $where->{mount_target}         = 'dir';
                 $where->{mount_options}->{dir} = $precondition->{mountdir};
-        } else {
-                return $inst_obj->install($precondition);
         }
-        return $inst_obj->guest_install( sub { shift->install($precondition) }, $where);
 
+        return $inst_obj->prepared_install( sub { shift->install($precondition) }, $where);
 }
 ;
 

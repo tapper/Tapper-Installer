@@ -116,14 +116,17 @@ sub gethostname
 
 
 
-=head2 guest_install
 
-Install a precondition inside a virtualisation guest. A guest can be
-given as image, partition or directory. This function makes the
-necessary preparations, calls the right precondition install function
-and cleans up afterwards. An image can be given as file name and
-partition or file name only. The later is supposed to be an image file
-containing just one partition.
+
+=head2 prepared_install
+
+Install a precondition with preparations up front. This could be
+mounting an NFS share or installing inside a virtualisation guest. A
+guest can be given as image, partition or directory. This function makes
+the necessary preparations, calls the right precondition install
+function and cleans up afterwards. An image can be given as file name
+and partition or file name only. The later is supposed to be an image
+file containing just one partition.
 
 @param sub      - execute this function with base dir set to mounted image file
 @param hash ref - define where to run the command
@@ -133,7 +136,7 @@ containing just one partition.
 
 =cut
 
-sub guest_install
+sub prepared_install
 {
         my ($self, $sub, $where) = @_;
         return "can only be called from an object" if not ref($self);
@@ -172,9 +175,6 @@ sub guest_install
                 when('dir'){
                         return "No target dir for guest installation" if not $where->{mount_options}->{dir};
                         $new_base_dir .= $where->{mount_options}->{dir};
-                }
-                default{
-                        return "Unknown mount_target ".$where->{mount_target}
                 }
         }
 
