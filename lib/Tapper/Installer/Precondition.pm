@@ -11,7 +11,7 @@ use Moose;
 use Socket;
 use Sys::Hostname;
 use YAML;
-
+use File::Temp qw/tempdir/;
 
 extends 'Tapper::Installer';
 
@@ -112,19 +112,51 @@ sub gethostname
 	return $hostname;
 }
 
+=head2 cleanup
 
+Clean up all remaining preparations (given in config).
 
-sub handle_dest_url
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub cleanup
 {
-        my ($self, $precondition) = @_;
-        if ( $precondition->{dest_url} =~ m{^nsf://((?:\w|\.)+)/(.+)} ) {
-                $precondition->{name} = $2;
-                $precondition->{filename} = $2;
+        my ($self) = @_;
+        foreach my $order (@{$self->cfg->{cleanup} || []}) {
+                $order->{call}->(@{$order->{options} || []});
         }
+        return 0;
 }
 
 
+=head2 handle_source_url
 
+A preconditions source may need some preparation, e.g. if it's located
+on an NFS share we need to mount this share. This function handles these
+preparations.
+
+@param hash ref - precondition
+
+@return success - hash ref with updated precondition
+@return error   - error string
+
+=cut
+
+sub handle_source_url
+{
+        my ($self, $precondition) = @_;
+
+        if ( $precondition->{source_url} =~ m{^nfs://(.+/)([^/]+)(/?)$} ) {
+                my $nfs_dir = tempdir (CLEANUP => 1); # allow to have multiple nfs mount
+                $self->log_and_exec("mount","-t nfs","$1", $nfs_dir);
+                $precondition->{name} = $precondition->{filename} = "$nfs_dir/$2";
+                push @{$self->cfg->{cleanup}}, {call => sub {$self->log_and_exec(@_)},
+                                                options => ['umount',$nfs_dir]};
+        }
+        return $precondition;
+}
 
 
 =head2 precondition_install
@@ -149,6 +181,8 @@ file containing just one partition.
 sub precondition_install
 {
         my ($self, $precondition) = @_;
+
+        $precondition = $self->handle_source_url($precondition) if $precondition->{source_url};
 
         my $retval;
         my ($error, $loop);
@@ -209,7 +243,7 @@ sub precondition_install
                         $self->log->error("Can not unmount $new_base_dir: $retval") if $retval;
         }
 
-        return 0;
+        return $self->cleanup();
 }
 
 
