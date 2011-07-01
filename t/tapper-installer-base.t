@@ -138,5 +138,34 @@ is_deeply(\@commands,
           ], "Normal install without guest"
          );
 
+my $package=Tapper::Installer::Precondition::Package->new($config);
+@commands = ();
+# last installation may have changed precondition so we need to set it again
+$precondition = {
+                 precondition_type => 'package',
+                 source_url        => 'nfs://osko:/exports/images/image.tgz',
+                };
+
+$retval = $package->precondition_install($precondition);
+is($retval, 0, 'Installation of package from NFS without errors');
+my $nfs_tempdir = $commands[0][3]; # if we succeed it will ;-)
+is_deeply(\@commands,
+          [
+           [
+            'mount',
+            '-t nfs',
+            'osko:/exports/images/',
+            $nfs_tempdir,
+           ],
+           [
+            "tar --no-same-owner -C $tempdir_base -xzf /$nfs_tempdir/image.tgz"
+           ],
+           [
+            'umount',
+            $nfs_tempdir,
+           ]
+          ],
+          "Installation of package from NFS without errors"
+         );
 
 done_testing();
