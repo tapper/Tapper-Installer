@@ -98,44 +98,6 @@ method cleanup()
 };
 
 
-=head2 precondition_install
-
-Encapsulate choosing where to install a precondition. Makes system_install
-function smaller and thus more readable.
-
-@param hash ref - describes precondition to be installed
-@param object   - object of precondition type, used to install
-
-@return success - 0
-@return error   - error string
-
-=cut
-
-method precondition_install($precondition, $inst_obj)
-{
-        my $where;
-
-        if ($precondition->{mountfile}) {
-                $where->{mount_options}->{image}     = $precondition->{mountfile};
-                if ( $precondition->{mountpartition} ) {
-                        $where->{mount_target}               = 'image_partition';
-                        $where->{mount_options}->{partition} = $precondition->{mountpartition};
-                } else {
-                        $where->{mount_target}       = 'image_flat';
-                }
-        }
-        elsif ($precondition->{mountpartition}) {
-                $where->{mount_target}               = 'partition';
-                $where->{mount_options}->{partition} = $precondition->{mountpartition};
-        }
-        elsif ($precondition->{mountdir}) {
-                $where->{mount_target}         = 'dir';
-                $where->{mount_options}->{dir} = $precondition->{mountdir};
-        }
-
-        return $inst_obj->prepared_install( sub { shift->install($precondition) }, $where);
-}
-;
 
 =head2 system_install
 
@@ -184,52 +146,52 @@ method system_install($state)
         foreach my $precondition (@{$config->{preconditions}}) {
                 if ($precondition->{precondition_type} eq 'image')
                 {
-                        $retval = $self->precondition_install($precondition, $image);
+                        $retval = $image->precondition_install($precondition);
                 }
                 elsif ($precondition->{precondition_type} eq 'package')
                 {
                         my $package=Tapper::Installer::Precondition::Package->new($config);
-                        $retval = $self->precondition_install($precondition, $package);
+                        $retval = $package->precondition_install($precondition);
                 }
                 elsif ($precondition->{precondition_type} eq 'copyfile')
                 {
                         my $copyfile = Tapper::Installer::Precondition::Copyfile->new($config);
-                        $retval = $self->precondition_install($precondition, $copyfile);
+                        $retval = $copyfile->precondition_install($precondition);
                 }
                 elsif ($precondition->{precondition_type} eq 'fstab')
                 {
                         my $fstab = Tapper::Installer::Precondition::Fstab->new($config);
-                        $retval = $self->precondition_install($precondition, $fstab);
+                        $retval = $fstab->precondition_install($precondition);
                 }
                 elsif ($precondition->{precondition_type} eq 'prc')
                 {
                         my $prc=Tapper::Installer::Precondition::PRC->new($config);
-                        $retval = $self->precondition_install($precondition, $prc);
+                        $retval = $prc->precondition_install($precondition);
                 }
                 elsif ($precondition->{precondition_type} eq 'rawimage')
                 {
                         my $rawimage=Tapper::Installer::Precondition::Rawimage->new($config);
-                        $retval = $self->precondition_install($precondition, $rawimage);
+                        $retval = $rawimage->precondition_install($precondition);
                 }
                 elsif ($precondition->{precondition_type} eq 'repository')
                 {
                         my $repository=Tapper::Installer::Precondition::Repository->new($config);
-                        $retval = $self->precondition_install($precondition, $repository);
+                        $retval = $repository->precondition_install($precondition);
                 }
                 elsif ($precondition->{precondition_type} eq 'exec')
                 {
                         my $exec=Tapper::Installer::Precondition::Exec->new($config);
-                        $retval = $self->precondition_install($precondition, $exec);
+                        $retval = $exec->precondition_install($precondition);
                 }
                 elsif ($precondition->{precondition_type} eq 'simnow_backend')
                 {
                         my $simnow=Tapper::Installer::Precondition::Simnow->new($config);
-                        $retval = $self->precondition_install($precondition, $simnow);
+                        $retval = $simnow->precondition_install($precondition);
                 }
                 elsif ($precondition->{precondition_type} eq 'kernelbuild')
                 {
                         my $kernelbuild=Tapper::Installer::Precondition::Kernelbuild->new($config);
-                        $retval = $self->precondition_install($precondition, $kernelbuild);
+                        $retval = $kernelbuild->precondition_install($precondition);
                 }
 
                 if ($retval) {

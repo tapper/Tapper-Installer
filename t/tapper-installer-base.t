@@ -46,7 +46,7 @@ my $precondition = {precondition_type => 'copyfile',
 
 
 my $copyfile=Tapper::Installer::Precondition::Copyfile->new($config);
-my $retval = $base->precondition_install($precondition, $copyfile);
+my $retval = $copyfile->precondition_install($precondition);
 is($retval, 0, 'Installation into flat image without errors');
 
 is_deeply(\@commands, [
@@ -67,7 +67,7 @@ $precondition = {
                  mountfile => '/tmp/directory/',
                  mountpartition => 'p1'
                 }; 
-$retval = $base->precondition_install($precondition, $copyfile);
+$retval = $copyfile->precondition_install($precondition);
 is($retval, 0, 'Installation into image partition without errors');
 is_deeply(\@commands, 
           [
@@ -92,7 +92,7 @@ $precondition = {
                  protocol => 'local',
                  mountpartition => '/does/not/exist',
                 }; 
-$retval = $base->precondition_install($precondition, $copyfile);
+$retval = $copyfile->precondition_install($precondition);
 is($retval, 0, 'Installation into partition without errors');
 is_deeply(\@commands, 
           [
@@ -111,7 +111,7 @@ $precondition = {
                  protocol => 'local',
                  mountdir => '/non/exist',
                 }; 
-$retval = $base->precondition_install($precondition, $copyfile);
+$retval = $copyfile->precondition_install($precondition);
 is($retval, 0, 'Installation into partition without errors');
 is_deeply(\@commands, 
           [

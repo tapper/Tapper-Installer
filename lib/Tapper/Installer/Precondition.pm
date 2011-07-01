@@ -114,90 +114,78 @@ sub gethostname
 
 
 
+sub handle_dest_url
+{
+        my ($self, $precondition) = @_;
+        if ( $precondition->{dest_url} =~ m{^nsf://((?:\w|\.)+)/(.+)} ) {
+                $precondition->{name} = $2;
+                $precondition->{filename} = $2;
+        }
+}
 
 
 
 
-=head2 prepared_install
+
+=head2 precondition_install
 
 Install a precondition with preparations up front. This could be
-mounting an NFS share or installing inside a virtualisation guest. A
-guest can be given as image, partition or directory. This function makes
-the necessary preparations, calls the right precondition install
+mounting an NFS share or installing inside a virtualisation guest or
+even no preparation at all.
+
+A guest can be given as image, partition or directory. This function
+makes the necessary preparations, calls the right precondition install
 function and cleans up afterwards. An image can be given as file name
 and partition or file name only. The later is supposed to be an image
 file containing just one partition.
 
-@param sub      - execute this function with base dir set to mounted image file
-@param hash ref - define where to run the command
+@param hash ref - precondition
 
 @return success - 0
 @return error   - error string
 
 =cut
 
-sub prepared_install
+sub precondition_install
 {
-        my ($self, $sub, $where) = @_;
-        return "can only be called from an object" if not ref($self);
+        my ($self, $precondition) = @_;
 
         my $retval;
         my ($error, $loop);
         $self->makedir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
 
-        # set image and partition even if they don't exist. In this case
-        # the wrong setting would be ignored
-        no warnings 'uninitialized';
+        my $image;
+        my $partition = $precondition->{mountpartition};
         my $new_base_dir = $self->cfg->{paths}{guest_mount_dir};
-        my $image        = $self->cfg->{paths}{base_dir}.$where->{mount_options}->{image};
-        my $partition    = $where->{mount_options}->{partition};
-        use warnings;
 
-        # prepare
-        given($where->{mount_target}){
-                when('partition'){
-                        return $retval if $retval = $self->log_and_exec("mount $partition ".$new_base_dir);
-                }
-                when('image_flat'){
-                        return "No image set" if not $where->{mount_options}->{image};
-                        return $retval if $retval = $self->log_and_exec("mount -o loop $image ".$new_base_dir);
-                }
-                when('image_partition'){
-                        return "No image set" if not $where->{mount_options}->{image};
-
+        if ($precondition->{mountfile}) {
+                $image        = $self->cfg->{paths}{base_dir}.$precondition->{mountfile};
+                if ( $precondition->{mountpartition} ) {
                         # make sure loop device is free
                         # don't use losetup -f, until it is available on installer NFS root
                         $self->log_and_exec("losetup -d /dev/loop0"); # ignore error since most of the time device won't be already bound
                         return $retval if $retval = $self->log_and_exec("losetup /dev/loop0 $image");
                         return $retval if $retval = $self->log_and_exec("kpartx -a /dev/loop0");
                         return $retval if $retval = $self->log_and_exec("mount /dev/mapper/loop0$partition ".$new_base_dir);
+                } else {
+                        return $retval if $retval = $self->log_and_exec("mount -o loop $image ".$new_base_dir);
                 }
-                when('dir'){
-                        return "No target dir for guest installation" if not $where->{mount_options}->{dir};
-                        $new_base_dir .= $where->{mount_options}->{dir};
-                }
+        }
+        elsif ($precondition->{mountpartition}) {
+                return $retval if $retval = $self->log_and_exec("mount $partition ".$new_base_dir);
+        }
+        elsif ($precondition->{mountdir}) {
+                        $new_base_dir .= $precondition->{mountdir};
         }
 
         # call
         my $config = merge($self->cfg, {paths=> {base_dir=> $new_base_dir}});
         my $object = ref($self)->new($config);
-        return $retval if $retval=$sub->($object);
+        return $retval if $retval=$object->install($precondition);
 
-        # cleanup
-        given($where->{mount_target}){
-                when('partition'){
-                        $retval = $self->log_and_exec("umount $new_base_dir");
-                        $self->log->error("Can not unmount $new_base_dir: $retval") if $retval;
-                }
-                when('image_flat'){
-                        $retval = $self->log_and_exec("umount $new_base_dir");
-                        $self->log->error("Can not unmount $new_base_dir: $retval") if $retval;
 
-                        # seems like mount -o loop uses a loop device that is not freed at umount
-                        $self->log_and_exec("kpartx -d /dev/loop0");
-                        $self->log_and_exec("losetup -d /dev/loop0");
-                }
-                when('image_partition'){
+        if ($precondition->{mountfile}) {
+                if ( $precondition->{mountpartition} ) {
                         return $retval if $retval = $self->log_and_exec("umount /dev/mapper/loop0$partition");
                         return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
                         if ($retval = $self->log_and_exec("losetup -d /dev/loop0")) {
@@ -205,7 +193,18 @@ sub prepared_install
                                 return $retval if $retval = $self->log_and_exec("kpartx -d /dev/loop0");
                                 return $retval if $retval = $self->log_and_exec("losetup -d /dev/loop0");
                         }
+                } else {
+                        $retval = $self->log_and_exec("umount $new_base_dir");
+                        $self->log->error("Can not unmount $new_base_dir: $retval") if $retval;
+
+                        # seems like mount -o loop uses a loop device that is not freed at umount
+                        $self->log_and_exec("kpartx -d /dev/loop0");
+                        $self->log_and_exec("losetup -d /dev/loop0");
                 }
+        }
+        elsif ($precondition->{mountpartition}) {
+                        $retval = $self->log_and_exec("umount $new_base_dir");
+                        $self->log->error("Can not unmount $new_base_dir: $retval") if $retval;
         }
 
         return 0;
