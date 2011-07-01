@@ -151,19 +151,9 @@ is($retval, 0, 'Installation of package from NFS without errors');
 my $nfs_tempdir = $commands[0][3]; # if we succeed it will ;-)
 is_deeply(\@commands,
           [
-           [
-            'mount',
-            '-t nfs',
-            'osko:/exports/images/',
-            $nfs_tempdir,
-           ],
-           [
-            "tar --no-same-owner -C $tempdir_base -xzf /$nfs_tempdir/image.tgz"
-           ],
-           [
-            'umount',
-            $nfs_tempdir,
-           ]
+           [ 'mount', '-t nfs', 'osko:/exports/images/', $nfs_tempdir, ],
+           [ "tar --no-same-owner -C $tempdir_base -xzf /$nfs_tempdir/image.tgz" ],
+           [ 'umount', $nfs_tempdir,]
           ],
           "Installation of package from NFS without errors"
          );
