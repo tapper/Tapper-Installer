@@ -210,7 +210,7 @@ sub install
         my $basedir = $self->cfg->{paths}{base_dir};
         my ($error, $retval);
         my $distro = $self->get_distro($basedir);
-        $retval    = $self->install_startscript($distro) if $distro and not $distro eq 'Debian';
+        $retval    = $self->install_startscript($distro) if $distro;
         return $retval if $retval;
 
         my $config;
