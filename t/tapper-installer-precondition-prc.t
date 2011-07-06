@@ -40,8 +40,8 @@ is($retval, "", 'Detect unknown distribution');
 
 $retval = $prc_installer->install();
 
-ok(-e "$tempdir/etc/tapper",'Write config file for PRC');
-ok(-e "$tempdir/test.config",'Write config file for WinPRC');
+ok(-e "$tempdir/etc/tapper",'Config file for PRC exists');
+ok(-e "$tempdir/test.config",'Config file for WinPRC exists');
 
 my $success;
 my $prc = {config =>
