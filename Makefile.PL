@@ -22,6 +22,7 @@ build_requires 'Tapper::Test' => "3.000010";
 build_requires 'Cwd';
 
 
+requires 'Linux::Personality';
 requires 'Tapper::Remote' => "3.000011";
 requires 'Tapper::Base' => "3.000010";
 requires 'File::Basename';
