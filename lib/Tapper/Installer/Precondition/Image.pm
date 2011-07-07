@@ -92,6 +92,17 @@ sub configure_fstab
         print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tauto\t0 0\n";
 	print $FSTAB "/data/tapper tapper:/data/tapper nfs noauto,vers=3 0 0\n";
 
+        # put swap in fstab
+ DEVICE:
+        foreach my $file_name (</dev/[sh]d[a-f]*>) {
+                my $file_type = $self->log_and_exec("file", "-c", $file_name);
+                if ($file_type =~m/swap/) {
+                        print $FSTAB "$file_name\tnone\tswap\tsw\t0\t0\n";
+                        last DEVICE;
+                }
+        }
+
+
         foreach my $image (@{$self->images}) {
                 print $FSTAB $image->{partition},"\t",$image->{mount},"\text3\tdefaults\t1 1\n";
         }
