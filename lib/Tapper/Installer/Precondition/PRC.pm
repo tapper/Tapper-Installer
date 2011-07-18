@@ -49,22 +49,22 @@ sub create_common_config
         return $config;
 }
 
-=head2 create_config
+=head2 create_unix_config
 
-Generate a config for PRC. Take special care for virtualisation
-environments. In this case, the host system runs a proxy which collects status
-messages from all virtualisation guests.
+Generate a config for PRC running on Unix system. Take special care for
+virtualisation environments. In this case, the host system runs a proxy
+which collects status messages from all virtualisation guests.
 
 @param hash reference - contains all information about the PRC to install
 
-@return success - (0, config hash)
-@return error   - (1, error string)
+@return hash ref - config
 
 =cut
 
-sub create_config
+sub create_unix_config
 {
         my ($self, $prc) = @_;
+
         my $config = $self->create_common_config($prc->{config});
         $config    = merge($config, {times=>$self->{cfg}->{times}});
         my @timeouts;
@@ -78,9 +78,32 @@ sub create_config
         {
                 $config->{mcp_server}      = $self->{cfg}->{mcp_server};
         }
-        
 
-        return (0, $config);
+        return $config;
+}
+
+=head2 write_unix_config
+
+Generate and write config for unix test.
+
+@param hash reference - contains all information about the PRC to install
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub write_unix_config
+{
+        my ($self, $prc) = @_;
+        my $basedir = $self->cfg->{paths}{base_dir};
+        my $config = $self->create_unix_config($prc);
+
+        $self->makedir("$basedir/etc") if not -d "$basedir/etc";
+        open my $file, '>',"$basedir/etc/tapper" or return "Can not open /etc/tapper in $basedir:$!";
+        print $file YAML::Dump($config);
+        close $file;
+        return 0;
 }
 
 
@@ -104,26 +127,26 @@ sub install_startscript
         ($error, $retval) = $self->log_and_exec("cp",module_file('Tapper::Installer', "startfiles/$distro/etc/init.d/tapper"),"$basedir/etc/init.d/tapper");
         return $retval if $error;
         if ($distro!~/tapper/) {
-        
+
                 pipe (my $read, my $write);
                 return ("Can't open pipe:$!") if not (defined $read and defined $write);
 
                 # fork for the stuff inside chroot
                 my $pid     = fork();
                 return "fork failed: $!" if not defined $pid;
-	
+
                 # child
                 if ($pid == 0) {
                         close $read;
                         chroot $basedir;
                         chdir ("/");
-		
+
                         my $ret = 0;
                         my ($error, $retval);
                         if ($distro=~m/suse|debian/) {
                                 ($error, $retval)=$self->log_and_exec("insserv","/etc/init.d/tapper");
                         } elsif ($distro=~m/(redhat)|(fedora)/) {
-                                ($error, $retval)=$self->log_and_exec("chkconfig","--add","tapper"); 
+                                ($error, $retval)=$self->log_and_exec("chkconfig","--add","tapper");
                         } elsif ($distro=~/gentoo/) {
                                 ($error, $retval)=$self->log_and_exec("rc-update", "add", "tapper_gentoo", "default");
                         } else {
@@ -143,22 +166,23 @@ sub install_startscript
         }
 }
 
-=head2 create_win_config
+=head2 create_windows_config
 
 Create the config for a windows guest running the special Win-PRC. Win-PRC
 expects a flat YAML with some different keys and does not want any waste
-options. 
+options.
 
 @param hash reference - contains all information about the PRC to install
 
-@return success - (0, config hash)
-@return error   - (1, error string)
+@return hash ref - windows config
 
 =cut
 
-sub create_win_config
+sub create_windows_config
 {
         my ($self, $prc) = @_;
+        my $basedir = $self->cfg->{paths}{base_dir};
+
         my $config = $self->create_common_config();
         $config->{guest_number} = $prc->{config}->{guest_number} if $prc->{config}->{guest_number};
 
@@ -182,10 +206,34 @@ sub create_win_config
                 $config->{test0_runtime_default} = $prc->{config}->{runtime};
                 $config->{test0_timeout}         = $prc->{config}->{timeout_testprogram}
         }
-        
-        return (0, $config);
-        
+        return $config;
+
 }
+
+=head2 write_windows_config
+
+Generate and write config for windows guest.
+
+@param hash reference - contains all information about the PRC to install
+
+@return success - 0
+@return error   - error string
+
+=cut
+
+sub write_windows_config
+{
+        my ($self, $prc) = @_;
+
+        my $config = $self->create_windows_config($prc);
+        my $basedir = $self->cfg->{paths}{base_dir};
+        open my $file, '>', $basedir.'/test.config' or return "Can not open /test.config in $basedir:$!";
+        print $file YAML::Dump($config);
+        close $file;
+
+        return 0
+}
+
 
 
 =head2 install
@@ -213,25 +261,13 @@ sub install
         $retval    = $self->install_startscript($distro) if $distro;
         return $retval if $retval;
 
-        my $config;
-        ($error, $config) = $self->create_config($prc);
-        return $config if $error;
-
-        $self->makedir("$basedir/etc") if not -d "$basedir/etc";
-
-        open my $FILE, '>',"$basedir/etc/tapper" or return "Can not open /etc/tapper in $basedir:$!";
-        print $FILE YAML::Dump($config);
-        close $FILE;
-
-        ($error, $config) = $self->create_win_config($prc);
-        return $config if $error;
-
-        open $FILE, '>', $basedir.'/test.config' or return "Can not open /test.config in $basedir:$!";
-        print $FILE YAML::Dump($config);
-        close $FILE;
+        $error = $self->write_unix_config($prc);
+        return $error if $error;
 
 
-        
+        $error = $self->write_windows_config($prc);
+        return $error if $error;
+
         if ($prc->{tapper_package}) {
                 my $pkg_object=Tapper::Installer::Precondition::Package->new($self->cfg);
                 my $package={filename => $prc->{tapper_package}};
