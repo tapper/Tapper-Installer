@@ -49,7 +49,7 @@ my $prc = {config =>
             runtime => 10,
             test_program => "winsst",
             timeout_testprogram => 60}};
-($success, $retval) = $prc_installer->create_win_config($prc);
+$retval = $prc_installer->create_windows_config($prc);
 
 use Data::Dumper;
 
@@ -86,7 +86,7 @@ is_deeply($retval, {guest_number => 1,
                                   timeout_testprogram => 60,
                                  }]}};
 
-($success, $retval) = $prc_installer->create_win_config($prc);
+$retval = $prc_installer->create_windows_config($prc);
 is_deeply($retval, {guest_number => 1,
                     hostname =>  "uruk",
                     paths =>
@@ -110,7 +110,7 @@ is_deeply($retval, {guest_number => 1,
                     test2_prog =>  "none"
                    }, 'Generate config for WinSST');
 
-($success, $retval) = $prc_installer->create_config($prc);
+$retval = $prc_installer->create_unix_config($prc);
 cmp_deeply($retval, superhashof($config), 'Create config');
 
 done_testing();
