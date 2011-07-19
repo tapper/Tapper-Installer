@@ -258,7 +258,7 @@ sub install
         my $basedir = $self->cfg->{paths}{base_dir};
         my ($error, $retval);
         my $distro = $self->get_distro($basedir);
-        $retval    = $self->install_startscript($distro) if $distro;
+        $retval    = $self->install_startscript($distro) if $distro and not $prc->{skip_startscript};
         return $retval if $retval;
 
         $error = $self->write_unix_config($prc);
