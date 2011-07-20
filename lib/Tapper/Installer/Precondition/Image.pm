@@ -90,7 +90,7 @@ sub configure_fstab
 
         # write defaults for fstab
         print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tauto\t0 0\n";
-	print $FSTAB "/data/tapper tapper:/data/tapper nfs noauto,vers=3 0 0\n";
+	print $FSTAB "tapper:/data/tapper /data/tapper nfs vers=3 0 0\n";
 
         # put swap in fstab
  DEVICE:
