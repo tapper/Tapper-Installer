@@ -1,5 +1,6 @@
 package Tapper::Installer::Precondition::Exec;
 
+use 5.010;
 use strict;
 use warnings;
 
@@ -88,7 +89,8 @@ sub install
                 my ($error, $output) = $self->log_and_exec("mount -o bind /dev/ ".$self->cfg->{paths}{base_dir}."/dev");
                 ($error, $output)    = $self->log_and_exec("mount -t sysfs sys ".$self->cfg->{paths}{base_dir}."/sys");
                 ($error, $output)    = $self->log_and_exec("mount -t proc proc ".$self->cfg->{paths}{base_dir}."/proc");
-                personality(PER_LINUX32) if $exec->{arch} eq 'linux32';
+                my $arch = $exec->{arch} // "";
+                personality(PER_LINUX32) if $arch eq 'linux32';
 		chroot $self->cfg->{paths}{base_dir};
 		chdir ("/");
                 ($error, $output)=$self->log_and_exec($command,@options);
