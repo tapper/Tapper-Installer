@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use Method::Signatures;
+use MooseX::Method::Signatures;
 use Moose;
 use IO::Handle; # needed to set pipe nonblocking
 use IO::Select;

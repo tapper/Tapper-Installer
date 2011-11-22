@@ -3,7 +3,7 @@ package Tapper::Installer::Precondition::Fstab;
 use strict;
 use warnings;
 
-use Method::Signatures;
+use MooseX::Method::Signatures;
 use Moose;
 use YAML;
 use File::Basename;
@@ -33,7 +33,7 @@ Install a file from an nfs share.
 
 =cut
 
-method install($precond)
+method install ($precond)
 {
 	my ($filename, $path, $retval);
 
@@ -46,7 +46,7 @@ method install($precond)
 
         system($cmd) == 0 or return ("Could not patch /etc/fstab: $!");
         return 0;
-};
+}
 
 1;
 

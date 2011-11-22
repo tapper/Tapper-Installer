@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use File::Path;
-use Method::Signatures;
+use MooseX::Method::Signatures;
 use Moose;
 extends 'Tapper::Installer::Precondition';
 
@@ -34,7 +34,7 @@ Create the raw image.
 
 =cut
 
-method install($img)
+method install ($img)
 {
         return "not filename given for rawimage" if not $img->{name};
 

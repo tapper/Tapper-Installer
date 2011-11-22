@@ -3,7 +3,7 @@ package Tapper::Installer::Precondition::Copyfile;
 use strict;
 use warnings;
 
-use Method::Signatures;
+use MooseX::Method::Signatures;
 use Moose;
 use YAML;
 use File::Basename;
@@ -34,8 +34,7 @@ local are supported protocols.
 
 =cut
 
-method install($file)
-{
+method install ($file) {
         return ('no filename given to copyfile::install') if not $file->{name};
         return ('no destination given for '.$file->{name}) if not $file->{dest};
 
@@ -58,7 +57,7 @@ method install($file)
 
         $retval = $self->copy_prc($file) if $file->{copy_prc};
         return $retval;
-};
+}
 
 
 
@@ -73,7 +72,7 @@ Install a file from a local source.
 
 =cut
 
-method install_local($file) {
+method install_local ($file) {
 	my $dest_filename = '';   # get rid of the "uninitialised" warning
         my ($dest_path, $retval);
 
@@ -90,7 +89,7 @@ method install_local($file) {
         return "Can't copy ".$file->{name}." to $dest_path$dest_filename:$message" if $error;
 
 	return(0);
-};
+}
 
 
 =head2 install_nfs
@@ -104,7 +103,7 @@ Install a file from an nfs share.
 
 =cut
 
-method install_nfs($file)
+method install_nfs ($file)
 {
 	my ($filename, $path, $retval, $error);
         my $nfs_dir='/mnt/nfs';
@@ -128,7 +127,7 @@ method install_nfs($file)
 
         $self->log_and_exec("umount $nfs_dir");
         return $retval;
-};
+}
 
 
 =head2 install_scp
@@ -142,14 +141,14 @@ Install a file using scp.
 
 =cut
 
-method install_scp($file)
+method install_scp ($file)
 {
         my $dest = $self->cfg->{paths}{base_dir}.$file->{dest};
 
         #(XXX) Bad solution, find a better one
         system("scp","-r",$file->{name},$dest);
         return $self->install_local($file);
-};
+}
 
 
 
@@ -165,10 +164,10 @@ Install a file using rsync.
 
 =cut
 
-method install_rsync($file)
+method install_rsync ($file)
 {
         return "Not implemented yet.";
-};
+}
 
 
 

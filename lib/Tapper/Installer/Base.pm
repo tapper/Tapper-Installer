@@ -1,6 +1,6 @@
 package Tapper::Installer::Base;
 
-use Method::Signatures;
+use MooseX::Method::Signatures;
 use Moose;
 
 use common::sense;
@@ -82,7 +82,7 @@ in log files. Only warns on error.
 
 =cut
 
-method cleanup()
+method cleanup
 {
         $self->log->info('Cleaning up logfiles');
         my @files_to_clean = ('/var/log/messages','/var/log/syslog');
@@ -95,7 +95,7 @@ method cleanup()
                 close $fh;
         }
         return 0;
-};
+}
 
 
 
@@ -110,7 +110,7 @@ should be send to the server by Log4perl.
 
 =cut
 
-method system_install($state)
+method system_install ($state)
 {
         my $retval;
         $state ||= 'standard';  # always defined value for state
@@ -233,7 +233,7 @@ method system_install($state)
                 }
         }
         return 0;
-};
+}
 
 
 1;

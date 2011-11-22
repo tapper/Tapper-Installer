@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use File::Basename;
-use Method::Signatures;
+use MooseX::Method::Signatures;
 use Moose;
 extends 'Tapper::Installer::Precondition';
 
@@ -33,7 +33,7 @@ This function encapsulates getting data out of a git repository.
 
 =cut
 
-method git_get($repo)
+method git_get ($repo)
 {
         return "no url given to git_get" if not $repo->{url};
         if (not $repo->{target}) {
@@ -50,7 +50,7 @@ method git_get($repo)
                 return($retval) if $error;
         }
 	return(0);
-};
+}
 
 =head2 hg_get
 
@@ -63,7 +63,7 @@ This function encapsulates getting data out of a mercurial repository.
 
 =cut 
 
-method hg_get($repo)
+method hg_get ($repo)
 {
         return "no url given to hg_get" if not $repo->{url};
         if (not $repo->{target}) {
@@ -79,7 +79,7 @@ method hg_get($repo)
                 return($retval) if $error;
         }
 	return(0);
-};
+}
 
 =head2 svn_get
 
@@ -92,10 +92,10 @@ This function encapsulates getting data out of a subversion repository.
 
 =cut
 
-method svn_get($repo)
+method svn_get ($repo)
 {
         $self->log->error("unimplemented");
-};
+}
 
 
 =head2 install
@@ -116,7 +116,7 @@ method install ($repository)
                 return ("Unknown repository type:",$repository->{type});
         }
         return "Bug: Repository::install() got after if/else.";
-};
+}
 
 1;
 
