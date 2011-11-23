@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use File::Path;
-use MooseX::Method::Signatures;
 use Moose;
 extends 'Tapper::Installer::Precondition';
 
@@ -34,8 +33,9 @@ Create the raw image.
 
 =cut
 
-method install ($img)
-{
+sub install {
+        my ($self, $img) = @_;
+
         return "not filename given for rawimage" if not $img->{name};
 
         my $img_size = 2048*1024; # 2GByte - size of standard rawimage in kbyte 

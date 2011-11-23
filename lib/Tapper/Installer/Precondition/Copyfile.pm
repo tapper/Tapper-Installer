@@ -3,7 +3,6 @@ package Tapper::Installer::Precondition::Copyfile;
 use strict;
 use warnings;
 
-use MooseX::Method::Signatures;
 use Moose;
 use YAML;
 use File::Basename;
@@ -34,7 +33,9 @@ local are supported protocols.
 
 =cut
 
-method install ($file) {
+sub install {
+        my ($self, $file) = @_;
+
         return ('no filename given to copyfile::install') if not $file->{name};
         return ('no destination given for '.$file->{name}) if not $file->{dest};
 
@@ -72,7 +73,9 @@ Install a file from a local source.
 
 =cut
 
-method install_local ($file) {
+sub install_local {
+        my ($self, $file) = @_;
+
 	my $dest_filename = '';   # get rid of the "uninitialised" warning
         my ($dest_path, $retval);
 
@@ -103,8 +106,9 @@ Install a file from an nfs share.
 
 =cut
 
-method install_nfs ($file)
-{
+sub install_nfs {
+        my ($self, $file) = @_;
+
 	my ($filename, $path, $retval, $error);
         my $nfs_dir='/mnt/nfs';
 
@@ -141,8 +145,9 @@ Install a file using scp.
 
 =cut
 
-method install_scp ($file)
-{
+sub install_scp {
+        my ($self, $file) = @_;
+
         my $dest = $self->cfg->{paths}{base_dir}.$file->{dest};
 
         #(XXX) Bad solution, find a better one
@@ -164,8 +169,9 @@ Install a file using rsync.
 
 =cut
 
-method install_rsync ($file)
-{
+sub install_rsync {
+        my ($self, $file) = @_;
+
         return "Not implemented yet.";
 }
 

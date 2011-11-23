@@ -3,7 +3,6 @@ package Tapper::Installer::Precondition::Fstab;
 use strict;
 use warnings;
 
-use MooseX::Method::Signatures;
 use Moose;
 use YAML;
 use File::Basename;
@@ -33,8 +32,9 @@ Install a file from an nfs share.
 
 =cut
 
-method install ($precond)
-{
+sub install {
+        my ($self, $precond) = @_;
+
 	my ($filename, $path, $retval);
 
         my $basedir = $self->cfg->{paths}{base_dir};

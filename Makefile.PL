@@ -37,7 +37,6 @@ requires 'IPC::Open3';
 requires 'IO::Select';
 requires 'List::Util';
 requires 'Log::Log4perl';
-requires 'MooseX::Method::Signatures';
 requires 'Moose';
 requires 'YAML' => "0.72";
 requires 'YAML::Syck' => "1.17";

@@ -1,6 +1,5 @@
 package Tapper::Installer::Base;
 
-use MooseX::Method::Signatures;
 use Moose;
 
 use common::sense;
@@ -82,8 +81,10 @@ in log files. Only warns on error.
 
 =cut
 
-method cleanup
+sub cleanup
 {
+        my ($self) = @_;
+
         $self->log->info('Cleaning up logfiles');
         my @files_to_clean = ('/var/log/messages','/var/log/syslog');
  FILE:
@@ -110,8 +111,10 @@ should be send to the server by Log4perl.
 
 =cut
 
-method system_install ($state)
+sub system_install
 {
+        my ($self, $state) = @_;
+
         my $retval;
         $state ||= 'standard';  # always defined value for state
         # fetch configurations from the server
