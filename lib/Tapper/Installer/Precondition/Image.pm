@@ -143,8 +143,7 @@ sub generate_user_grub_conf
 =head2 generate_grub_menu_lst
 
 Create a grub config file (menu.lst) based on the options in the configuration
-hash. The function is mainly a wrapper for create_menu_lst_entry and
-create_new_menu_lst.
+hash.
 
 @return success - 0
 @return error   - error string
@@ -158,12 +157,7 @@ sub generate_grub_menu_lst
 
         my $partition = $self->images->[0]->{partition};
 
-        if ($self->cfg->{grub}) {
-                return $retval if $retval = $self->generate_user_grub_conf($partition);
-        } else {
-                return $retval if $retval = $self->create_new_menu_lst();
-                return $retval if $retval = $self->create_menu_lst_entry($partition);
-        }
+        return $retval if $retval = $self->generate_user_grub_conf($partition);
 	return 0;
 }
 
@@ -311,64 +305,12 @@ using PXE grub.
 sub copy_menu_lst
 {
         my ($self) = @_;
+
         my $hostname      = $self->gethostname();
         my $menu_lst_file = $self->cfg->{paths}{base_dir}."/boot/grub/menu.lst";
-
-        my $tapper_conf  = $self->cfg->{paths}{grubpath};
+        my $tapper_conf   = $self->cfg->{paths}{grubpath};
 
         return $self->log_and_exec("cp $menu_lst_file $tapper_conf/$hostname.lst");
-}
-
-
-=head2 create_menu_lst_entry
-
-Create and entry for the installed kernel in menu.lst. The kernel must be
-named /boot/vmlinuz.
-
-@param string - name of the root partition
-
-@return success - 0
-@return error   - error string
-
-=cut
-
-sub create_menu_lst_entry
-{
-        my ($self, $device_file) = @_;
-	my $partition_number     = $self->get_partition_number($device_file);
-	my ($error,$grub_device) = $self->get_grub_device( $device_file);
-        return $grub_device if $error;
-        my $id                   = $self->cfg->{testrun};
-        $id ||="unknown";
-        my $entry                = "title Test run $id\n".
-          "root (hd$grub_device,$partition_number)\n".
-            "kernel /boot/vmlinuz root=$device_file earlyprintk=serial,ttyS0,115200 ".
-              "console=ttyS0,115200 ip=dhcp noapic tapper_host=".$self->cfg->{server}."\n";
-        $entry .= "initrd /boot/initrd\n\n" if -e $self->cfg->{paths}{base_dir}."/boot/initrd";
-
-
-        return $self->write_menu_lst($entry,0);
-}
-
-
-=head2 create_new_menu_lst
-
-Create a new menu.lst with default header information. Existing grub configs
-are silently overwritten.
-
-@return success - 0
-@return error   - error string
-
-=cut
-
-sub create_new_menu_lst
-{
-        my ($self) = @_;
-        my $base = "serial --unit=0 --speed=115200\n".
-          "terminal serial\n".
-            "timeout 3\n".
-              "default 0\n\n\n";
-        return $self->write_menu_lst($base,"truncate");
 }
 
 
