@@ -133,8 +133,12 @@ sub generate_user_grub_conf
 	my ($error, $grub_device) = $self->get_grub_device( $device_file);
         return $grub_device if $error;
 
+        my $initrd_options = '';
+        $initrd_options = "initrd /boot/initrd" if -e $self->cfg->{paths}{base_dir}."/boot/initrd";
+
         $conf_string =~ s/\$root/$device_file/g;
         $conf_string =~ s/\$grubroot/(hd$grub_device,$partition_number)/g;
+        $conf_string =~ s/\$initrd_options/$initrd_options/g;
 
         return $self->write_menu_lst($conf_string, "truncate");
 }
