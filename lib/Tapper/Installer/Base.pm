@@ -220,6 +220,9 @@ sub system_install
         given ($state){
                 when ("standard"){
                         return 0 if $config->{installer_stop};
+                        system("sync");
+                        system("sync");
+                        system("sync");
                         system("reboot");
                 }
                 when ('simnow'){
