@@ -27,6 +27,11 @@ Tapper::Installer::Precondition::Package - Install a package to a given location
 
 This function encapsulates installing one single package. At the moment, .tar,
 .tar.gz, .tar.bz2, rpm and deb are recognised.
+Recognised options for package preconditions are:
+* filename         - absolute or relative path of the package file (relativ to package_dir in config)
+* target_directory - directory where to unpack package
+* 
+
 
 @param hash reference - contains all information about the package
 
