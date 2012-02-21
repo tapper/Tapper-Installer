@@ -93,13 +93,9 @@ sub configure_fstab
 	print $FSTAB "tapper:/data/tapper /data/tapper nfs vers=3 0 0\n";
 
         # put swap in fstab
- DEVICE:
-        foreach my $file_name (glob("/dev/[sh]d[a-f]*")) {
-                my $file_type = $self->log_and_exec("file", "-c", $file_name);
-                if ($file_type =~m/swap/) {
-                        print $FSTAB "$file_name\tnone\tswap\tsw\t0\t0\n";
-                        last DEVICE;
-                }
+        foreach my $line (grep {$_ =~ m/swap/i} qx(fdisk -l)) {
+                my ($file_name) = split / +/, $line;
+                print $FSTAB "$file_name\tnone\tswap\tsw\t0\t0\n";
         }
 
 
