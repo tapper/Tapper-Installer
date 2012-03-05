@@ -99,6 +99,25 @@ sub cleanup
 }
 
 
+=head2 send_keep_alive_loop
+
+Send keepalive messages to MCP in an endless loop.
+
+@param int - sleep time between two keepalives
+
+=cut
+
+sub send_keep_alive_loop
+{
+        my ($self, $sleeptime) = @_;
+        return unless $sleeptime;
+        while (1) {
+                $self->mcp_inform("keep-alive");                
+                sleep($sleeptime);
+        }
+        return;
+}
+
 
 =head2 system_install
 
@@ -133,6 +152,17 @@ sub system_install
 
         $self->log->info("Installing testrun (".$self->cfg->{testrun_id}.") on host ".$self->cfg->{hostname});
         $self->mcp_inform("start-install") unless $state eq "autoinstall";
+
+        if ($config->{times}{keep_alive_timeout}) {
+                $SIG{CHLD} = 'IGNORE';
+                my $pid = fork();
+                if ($pid == 0) {
+                        $self->send_keep_alive_loop($config->{times}{keep_alive_timeout});
+                        exit;
+                } else {
+                        $config->{keep_alive_child} = $pid;
+                }
+        }
 
         if ($state eq 'simnow') {
                 $retval = $self->free_loop_device();
@@ -213,6 +243,14 @@ sub system_install
 
         }
         $image->unmount();
+
+        # no longer send keepalive
+        if ($config->{keep_alive_child}) {
+                kill 15, $config->{keep_alive_child};
+                sleep 2;
+                kill 9, $config->{keep_alive_child};
+        }
+
 
         $self->mcp_inform("end-install");
         $self->log->info("Finished installation of test machine");
