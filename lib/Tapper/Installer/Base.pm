@@ -112,7 +112,7 @@ sub send_keep_alive_loop
         my ($self, $sleeptime) = @_;
         return unless $sleeptime;
         while (1) {
-                $self->mcp_inform("keep-alive");                
+                $self->mcp_inform("keep-alive");
                 sleep($sleeptime);
         }
         return;
@@ -273,7 +273,7 @@ sub system_install
                                                  error => "Can not start simnow: $retval",
                                                  prc_number => 0});
                         }
-;
+
                 }
         }
         return 0;
