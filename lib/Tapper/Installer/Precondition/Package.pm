@@ -55,8 +55,9 @@ sub install
         }
 
         my $package_dir = '';
-        $package_dir    = $self->cfg->{paths}{package_dir} unless $filename =~m(^/);
-        my $pkg         = "$package_dir/$filename";
+        $package_dir    = $self->cfg->{paths}{package_dir};
+        my $pkg = $filename;
+        $pkg = "$package_dir/$filename" unless $filename =~ m(^/);
 
         my ($error, $type) = $self->get_file_type("$pkg");
         return("Can't get file type of $filename: $type") if $error;
