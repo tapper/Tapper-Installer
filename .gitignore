@@ -20,3 +20,6 @@ tapper_reportsdb_development.sqlite
 MANIFEST
 Makefile
 META.yml
+MYMETA.json
+MYMETA.yml
+
