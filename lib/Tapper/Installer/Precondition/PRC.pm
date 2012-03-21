@@ -46,6 +46,8 @@ sub create_common_config
         $config->{scenario_id}     = $self->{cfg}->{scenario_id} if $self->{cfg}->{scenario_id};
         $config->{paths}           = $self->{cfg}->{paths};
         $config->{files}           = $self->{cfg}->{files} if $self->{cfg}->{files} ;
+        $config->{testplan}        = $self->{cfg}->{testplan} if $self->{cfg}->{testplan};
+
         return $config;
 }
 
