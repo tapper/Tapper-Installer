@@ -92,6 +92,7 @@ sub install
                 personality(PER_LINUX32) if $arch eq 'linux32';
 		chroot $self->cfg->{paths}{base_dir};
 		chdir ("/");
+                %ENV = (%ENV, %{$exec->{environment} || {} });
                 ($error, $output)=$self->log_and_exec($command,@options);
                 print( $write $output, "\n") if $output;
                 close $write;
