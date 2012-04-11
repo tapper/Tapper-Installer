@@ -66,7 +66,11 @@ sub install
 
         if ($exec->{filename}) {
                 $command = $exec->{filename};
-                return("$command is not an executable") if not -x $self->cfg->{paths}{base_dir}.$command;
+                my $cmd_full = $self->cfg->{paths}{base_dir}.$command;
+                if (not -x $cmd_full) {
+                        $self->log_and_exec ("chmod", "ugo+x", $cmd_full);
+                        return("tried to execute $cmd_full which is not an execuable and can not set exec flag") if not -x $cmd_full;
+                }
         }
 
         $self->log->debug("executing $command with options ",join (" ",@options));
