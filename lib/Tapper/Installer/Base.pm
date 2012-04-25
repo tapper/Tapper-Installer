@@ -269,7 +269,7 @@ sub system_install
                         $retval = qx(/opt/tapper/bin/perl /opt/tapper/bin/tapper-simnow-start --config=$simnow_config);
                         if ($?) {
                                 $self->log->error("Can not start simnow: $retval");
-                                $self->mcp_send({state => 'error-test',
+                                $self->mcp_send({state => 'error-install',
                                                  error => "Can not start simnow: $retval",
                                                  prc_number => 0});
                         }
