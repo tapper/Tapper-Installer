@@ -1,4 +1,6 @@
-#! perl
+#! /usr/bin/perl
+# PODNAME: tapper-installer-client
+# ABSTRACT: cmdline frontend to Installer.simnow
 
 use warnings;
 use strict;
