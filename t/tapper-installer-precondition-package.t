@@ -44,9 +44,21 @@ my $pkg_precondition = {
 
 my $module = Test::MockModule->new('Tapper::Installer::Precondition::Exec');
 $module->mock('file_save', sub {return 0});
-$module->mock('log_and_exec', sub { return 0});
+$module->mock('log_and_exec', sub { return 0;});
+
 
 my $pkg_installer = Tapper::Installer::Precondition::Package->new($config);
 my $retval = $pkg_installer->install($pkg_precondition);
 is($retval, 0, 'Package installed');
+
+my @exec;
+my $mock_package = Test::MockModule->new('Tapper::Installer::Precondition::Package');
+$mock_package->mock('log_and_exec', sub { shift @_; push @exec, @_; return 0;});
+
+$pkg_precondition = { url => 'nfs://osko:/path/to/debian_package_test.tgz', };
+$retval = $pkg_installer->install($pkg_precondition);
+is($retval, 0, 'Package installed');
+cmp_deeply(\@exec, supersetof("mount osko:/path/to /mnt/nfs",
+                              "umount /mnt/nfs"), 'Mount and umount NFS');
+
 done_testing();
