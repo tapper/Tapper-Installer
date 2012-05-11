@@ -48,6 +48,7 @@ sub install
                 given($proto) {
                         when ('nfs') {
                                 my $nfs_dir='/mnt/nfs';
+                                $self->makedir($nfs_dir);
                                 my $path = dirname $fullpath;
                                 my $filename = basename $fullpath;
                                 my ($error, $retval) = $self->log_and_exec("mount $path $nfs_dir");
