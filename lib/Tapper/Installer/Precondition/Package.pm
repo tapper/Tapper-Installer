@@ -30,7 +30,7 @@ This function encapsulates installing one single package. At the moment, .tar,
 Recognised options for package preconditions are:
 * filename         - absolute or relative path of the package file (relativ to package_dir in config)
 * target_directory - directory where to unpack package
-* 
+*
 
 
 @param hash reference - contains all information about the package
@@ -43,6 +43,27 @@ Recognised options for package preconditions are:
 sub install
 {
         my ($self, $package) = @_;
+        if ($package->{url}) {
+                my ($proto, $fullpath) = $package->{url} =~ m|^(\w+)://(.+)$|;
+                given($proto) {
+                        when ('nfs') {
+                                my $nfs_dir='/mnt/nfs';
+                                $self->makedir($nfs_dir);
+                                my $path = dirname $fullpath;
+                                my $filename = basename $fullpath;
+                                my ($error, $retval) = $self->log_and_exec("mount $path $nfs_dir");
+                                return ("Can't mount nfs share $path to $nfs_dir: $retval") if $error;
+                                delete $package->{url};
+                                $package->{filename} = "$nfs_dir/$filename";
+                                $self->install($package);
+                                ($error, $retval) = $self->log_and_exec("umount $nfs_dir");
+                                return 0;
+                        }
+                        default { return ("Procol'$proto' is not supported") }
+                }
+        }
+
+
         my $filename = $package->{filename};
 	$self->log->debug("installing $filename");
 
