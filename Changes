@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+4.0.1     2012-05-16
         - [FEAT] Package precondition now supports url
         - [FEAT] Exec precondition accepts ENV settings
         - [FEAT] send keep-alive messages
