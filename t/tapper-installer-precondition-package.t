@@ -53,6 +53,7 @@ is($retval, 0, 'Package installed');
 
 my @exec;
 my $mock_package = Test::MockModule->new('Tapper::Installer::Precondition::Package');
+$mock_package->mock('makedir', sub { return 0; });
 $mock_package->mock('log_and_exec', sub { shift @_; push @exec, @_; return 0;});
 
 $pkg_precondition = { url => 'nfs://osko:/path/to/debian_package_test.tgz', };
