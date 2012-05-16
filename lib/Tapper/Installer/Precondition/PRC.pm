@@ -297,13 +297,13 @@ distribution
 sub get_distro
 {
         my ($self, $dir) = @_;
-	my @files=glob("$dir/etc/*-release");
-	for my $file(@files){
-		return "suse"    if $file  =~ /suse/i;
-		return "redhat"  if $file  =~ /redhat/i;
-		return "gentoo"  if $file  =~ /gentoo/i;
-		return "tapper" if $file  =~ /tapper/i;
-	}
+        my @files=glob("$dir/etc/*-release");
+        for my $file(@files){
+                return "suse"    if $file  =~ /suse/i;
+                return "redhat"  if $file  =~ /redhat/i;
+                return "gentoo"  if $file  =~ /gentoo/i;
+                return "tapper" if $file  =~ /tapper/i;
+        }
         {
                 open my $fh, '<',"$dir/etc/issue" or next;
                 local $\='';
@@ -313,32 +313,8 @@ sub get_distro
                 ($distro) = $issue =~ m/(Debian)/;
                 return lc($distro) if $distro;
         }
-	return "";
+        return "";
 }
 
 
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd

@@ -14,11 +14,10 @@ BEGIN {
 
 my $tempdir = tempdir( CLEANUP => 1 );
 
-my $config = {paths => { 
+my $config = {paths => {
                         base_dir    => $tempdir,
                         simnow_path => "/simnow/path",
                        },
-              
               files => {
                         simnow_config => "$tempdir/config",
                         simnow_script => "family10_sles10_xen.simnow",

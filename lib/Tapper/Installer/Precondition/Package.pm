@@ -20,9 +20,6 @@ Tapper::Installer::Precondition::Package - Install a package to a given location
 
 =head1 FUNCTIONS
 
-=cut
-
-
 =head2 install
 
 This function encapsulates installing one single package. At the moment, .tar,
@@ -31,7 +28,6 @@ Recognised options for package preconditions are:
 * filename         - absolute or relative path of the package file (relativ to package_dir in config)
 * target_directory - directory where to unpack package
 *
-
 
 @param hash reference - contains all information about the package
 
@@ -65,7 +61,7 @@ sub install
 
 
         my $filename = $package->{filename};
-	$self->log->debug("installing $filename");
+        $self->log->debug("installing $filename");
 
         my $basedir     = $self->cfg->{paths}{base_dir};
 
@@ -120,31 +116,4 @@ sub install
         return(0);
 }
 
-
-
-
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd

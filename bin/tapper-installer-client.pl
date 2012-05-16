@@ -8,7 +8,7 @@ use Log::Log4perl;
 use Tapper::Installer::Base;
 
 BEGIN {
-	Log::Log4perl::init('/etc/log4perl.cfg');
+        Log::Log4perl::init('/etc/log4perl.cfg');
 }
 
 
@@ -24,7 +24,7 @@ tapper-installer-client.pl - control the installation and setup of an automatic 
 
 =head1 SYNOPSIS
 
-tapper-installer-client.pl 
+tapper-installer-client.pl
 
 =head1 DESCRIPTION
 

@@ -42,11 +42,11 @@ URL rewrite.
 
 sub fix_git_url
 {
-	my ($self, $git_url) = @_;
+        my ($self, $git_url) = @_;
         $self->log->info("Git URL before rewrite: $git_url");
-	$git_url =~ s|^git://osrc((\.osrc)?\.amd\.com)?/|git://wotan.amd.com/|;
+        $git_url =~ s|^git://osrc((\.osrc)?\.amd\.com)?/|git://wotan.amd.com/|;
         $self->log->info("Git URL after  rewrite: $git_url");
-	return $git_url;
+        return $git_url;
 }
 
 =head2 git_get
@@ -65,17 +65,17 @@ repository. It changes the current directory into the the repository.
 
 sub git_get
 {
-	my ($self, $git_url, $git_rev)=@_;
+        my ($self, $git_url, $git_rev)=@_;
 
         # git may generate more output than log_and_exec can handle, thus keep the system()
         chdir $self->cfg->{paths}{base_dir};
-	$git_url = $self->fix_git_url($git_url);
-	system("git","clone","-q",$git_url,"linux") == 0
+        $git_url = $self->fix_git_url($git_url);
+        system("git","clone","-q",$git_url,"linux") == 0
           or return("unable to clone git repository $git_url");
-	chdir ("linux");
+        chdir ("linux");
         system("git","checkout",$git_rev) == 0
           or return("unable to check out $git_rev from git repository $git_url");
-	return(0);
+        return(0);
 }
 
 =head2 get_config
@@ -153,7 +153,7 @@ sub make_initrd
         my ($self) = @_;
         my ($error, $kernelversion) = $self->log_and_exec("make","kernelversion");
         my $kernel_file = "vmlinuz-$kernelversion";
-        
+
         # double block, the outermost belongs to if, the innermost can be left with last;
         # great stuff, isn't it?
         if (not -e "/boot/$kernel_file") {{
@@ -194,7 +194,7 @@ sub make_initrd
         $modules   .= " ide-core 3c59x tg3 mii amd8111e e1000e bnx2 bnx2x ixgb";
         my $mkinitrd_command = "mkinitrd -k /boot/$kernel_file -i /boot/initrd-$kernelversion ";
         $mkinitrd_command   .= qq(-m "$modules");
-        
+
         $self->log->debug($mkinitrd_command);
         system($mkinitrd_command) == 0
           or return("Can not create initrd file, see log file");
@@ -229,23 +229,23 @@ sub install
         my $git_url     = $build->{git_url} or return 'No git url given';
         my $git_rev     = $build->{git_changeset} || 'HEAD';
         my $config_file = $build->{configfile_path};
-        
-	$self->log->debug("Installing kernel from $git_url $git_rev");
+
+        $self->log->debug("Installing kernel from $git_url $git_rev");
 
         my $git_path   = qx(which git);
         chomp $git_path;
         return "Can not find git. Git_path is '$git_path'" if not -e $git_path;
 
-	pipe (my $read, my $write);
-	return ("Can't open pipe:$!") if not (defined $read and defined $write);
+        pipe (my $read, my $write);
+        return ("Can't open pipe:$!") if not (defined $read and defined $write);
 
 
-	# we need to fork for chroot
-	my $pid = fork();
-	return "fork failed: $!" if not defined $pid;
+        # we need to fork for chroot
+        my $pid = fork();
+        return "fork failed: $!" if not defined $pid;
 
-	# hello child
-	if ($pid == 0) {
+        # hello child
+        if ($pid == 0) {
                 close $read;
                 my ($error, $output);
 
@@ -290,8 +290,8 @@ sub install
                 $ENV{TAPPER_OUTPUT_PATH}     = $output_dir;
 
 
-		# chroot to execute script inside the future root file system
-		chroot $self->cfg->{paths}{base_dir};
+                # chroot to execute script inside the future root file system
+                chroot $self->cfg->{paths}{base_dir};
                 chdir('linux');
 
                 $error = $self->make_kernel();
@@ -308,7 +308,7 @@ sub install
 
                 close $write;
                 exit 0;
-	} else {
+        } else {
                 close $write;
                 my $select = IO::Select->new( $read );
                 my ($error, $output);
@@ -331,34 +331,10 @@ sub install
                 if ($?) {
                         return("Building kernel from $git_url $git_rev failed: $output");
                 }
-		return(0);
-	}
+                return(0);
+        }
 }
 ;
 
 
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd

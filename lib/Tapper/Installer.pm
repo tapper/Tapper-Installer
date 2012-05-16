@@ -16,6 +16,12 @@ has cfg => (is      => 'rw',
            );
 with 'Tapper::Remote::Net';
 
+=head2 BUILD
+
+Initialize with config.
+
+=cut
+
 sub BUILD
 {
         my ($self, $config) = @_;
@@ -42,6 +48,5 @@ sub logdie
         }
         die $msg;
 }
-
 
 1;

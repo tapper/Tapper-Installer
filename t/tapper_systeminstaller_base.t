@@ -18,14 +18,14 @@ my $mock_base = Test::MockModule->new('Tapper::Base');
         # testing gethostname with an IP address will try to set the hostname
         # this may cause problems if tester is root and thus can set the hostname
         my $sys_hostname = new Test::MockModule('Sys::Hostname');
-        $sys_hostname->mock('hostname', sub { return 'bascha' });        
+        $sys_hostname->mock('hostname', sub { return 'bascha' });
 
         my $inst=new Tapper::Installer::Precondition;
         is (Sys::Hostname::hostname(), 'bascha', 'mocking worked');
         is ($inst->gethostname(), 'bascha', "gethostname by ip");
 }
 
-# get_file_type checks in two ways. 
+# get_file_type checks in two ways.
 # First it analyses the file suffix. For this, the file does not need to exists.
 my $inst_base = new Tapper::Installer::Precondition;
 is ($inst_base->get_file_type('/tmp/1.iso'), 'iso', 'Detected ISO using extenstion.');

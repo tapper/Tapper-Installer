@@ -37,9 +37,9 @@ Get the partition part of grub notation of a given device file eg. /dev/hda1.
 sub get_partition_number
 {
         my ($self, $device_file) = @_;
-	my ($partition_number) = $device_file =~ m/(\d+)/;
-	$partition_number--;
-	return $partition_number;
+        my ($partition_number) = $device_file =~ m/(\d+)/;
+        $partition_number--;
+        return $partition_number;
 }
 
 =head2 get_grub_device
@@ -61,11 +61,11 @@ sub get_grub_device
                                         "--root-directory=$basedir","--no-floppy","$device_file");
         my ($grub_device) = $device_file =~ m/[hs]d([a-z])/;
         $grub_device      =~ tr/[a-j]/[0-9]/;
-	if ($grub_device eq "") {
+        if ($grub_device eq "") {
                 $self->log->warn( "Grub device not found, took '0'");
                 $grub_device = 0;
-  	}
-	return (0, $grub_device);
+        }
+        return (0, $grub_device);
 }
 
 
@@ -83,14 +83,14 @@ partitions.
 sub configure_fstab
 {
         my ($self) = @_;
-	# Creates fstab-entry for the final partition
+        # Creates fstab-entry for the final partition
 
         $self->log->debug("Configuring fstab to contain installed images");
         open (my $FSTAB, ">", $self->cfg->{paths}{base_dir}."/etc/fstab") or return "Can't open fstab for appending: $!";
 
         # write defaults for fstab
         print $FSTAB "proc\t/proc\tproc\tdefaults\t0 0\n","sysfs\t/sys\tsysfs\tauto\t0 0\n";
-	print $FSTAB "tapper:/data/tapper /data/tapper nfs vers=3 0 0\n";
+        print $FSTAB "tapper:/data/tapper /data/tapper nfs vers=3 0 0\n";
 
         # put swap in fstab
         foreach my $line (grep {$_ =~ m/swap/i} qx(fdisk -l)) {
@@ -125,8 +125,8 @@ sub generate_user_grub_conf
         my $mount_point=$self->cfg->{paths}{base_dir};
         my $conf_string=$self->cfg->{grub};
 
-	my $partition_number = $self->get_partition_number($device_file);
-	my ($error, $grub_device) = $self->get_grub_device( $device_file);
+        my $partition_number = $self->get_partition_number($device_file);
+        my ($error, $grub_device) = $self->get_grub_device( $device_file);
         return $grub_device if $error;
 
         my $initrd_options = '';
@@ -158,7 +158,7 @@ sub generate_grub_menu_lst
         my $partition = $self->images->[0]->{partition};
 
         return $retval if $retval = $self->generate_user_grub_conf($partition);
-	return 0;
+        return 0;
 }
 
 
@@ -177,8 +177,8 @@ sub prepare_boot
         my $retval = 0;
         return $retval if $retval = $self->configure_fstab();
         return $retval if $retval = $self->generate_grub_menu_lst( );
-	return $retval if $retval = $self->generate_pxe_grub();
-# 	return $retval if $retval = $self->copy_menu_lst();
+        return $retval if $retval = $self->generate_pxe_grub();
+        # return $retval if $retval = $self->copy_menu_lst();
         return 0;
 }
 
@@ -270,8 +270,8 @@ sub generate_pxe_grub
 
         my $partition = $self->cfg->{preconditions}->[0]->{partition};
         my $hostname = $self->gethostname();
-	my $partition_number = $self->get_partition_number( $partition );
-	my ($error, $grub_device) = $self->get_grub_device( $partition );
+        my $partition_number = $self->get_partition_number( $partition );
+        my ($error, $grub_device) = $self->get_grub_device( $partition );
         return $grub_device if $error;
 
 
@@ -330,8 +330,8 @@ and testability.
 sub write_menu_lst
 {
         my ($self, $content, $truncate) = @_;
-	$self->makedir($self->cfg->{paths}{base_dir}."/boot/grub/");
-	my $menu_lst_file = $self->cfg->{paths}{base_dir}."/boot/grub/menu.lst";
+        $self->makedir($self->cfg->{paths}{base_dir}."/boot/grub/");
+        my $menu_lst_file = $self->cfg->{paths}{base_dir}."/boot/grub/menu.lst";
         my $mode = '>>';
         if ($truncate) {
                 $mode = '>';
@@ -376,7 +376,7 @@ sub install
         # mount points in image precondition are relative to test system root
         # installation needs it relative to current root
         my $mount_point = $self->cfg->{paths}{base_dir}.$image->{mount};
-	$error = $self->makedir($mount_point);
+        $error = $self->makedir($mount_point);
         return $error if $error;
 
         if ($image->{image}) {
@@ -413,7 +413,7 @@ sure to set partition label reasonably.
 sub install_image
 {
         my ($self, $image_file, $device_file, $mount_point) = @_;
- 	my ($error, $partition_size)=$self->log_and_exec("/sbin/blockdev --getsize64 $device_file");
+        my ($error, $partition_size)=$self->log_and_exec("/sbin/blockdev --getsize64 $device_file");
         if ($error) {
                 $self->log->warn("Can't get size of partition $device_file: $partition_size. Won't check if images fits.");
                 $partition_size = 0;
@@ -422,26 +422,26 @@ sub install_image
         my ($partition_label, $image_type);
         ($error, $image_type)=$self->get_file_type($image_file);
 
-	($error, $partition_label) = $self->get_partition_label($device_file);
+        ($error, $partition_label) = $self->get_partition_label($device_file);
         if ($error) {
                 $self->log->info("Can't get partition label of $device_file: $partition_label");
                 $partition_label='';
         }
-	$partition_label ||= "testing";
+        $partition_label ||= "testing";
 
-	if ($image_type eq "iso") {
+        if ($image_type eq "iso") {
                 # ISO images are preformatted and thus bring their own
                 # partition label
-		return $self->install_image_iso($image_file, $partition_size, $device_file, $mount_point);
+                return $self->install_image_iso($image_file, $partition_size, $device_file, $mount_point);
         } elsif ($image_type eq "tar") {
-		return $self->install_image_tar($image_file, $partition_size, $device_file, $mount_point, $partition_label);
+                return $self->install_image_tar($image_file, $partition_size, $device_file, $mount_point, $partition_label);
         } elsif ($image_type eq "gzip"){
-		return $self->install_image_gz($image_file, $partition_size, $device_file, $mount_point, $partition_label);
+                return $self->install_image_gz($image_file, $partition_size, $device_file, $mount_point, $partition_label);
         } elsif ($image_type eq "bz2") {
-		return $self->install_image_bz2($image_file, $partition_size, $device_file, $mount_point, $partition_label);
+                return $self->install_image_bz2($image_file, $partition_size, $device_file, $mount_point, $partition_label);
         } else {
                 return("Imagetype could not be detected");
-	}
+        }
         return 0;
 }
 
@@ -588,13 +588,13 @@ Install an image to a given partition and mount it to a given mount point.
 sub copy_image
 {
         my ($self, $device_file, $image_file, $mount_point) = @_;
-        $image_file = $self->cfg->{paths}{image_dir}.$image_file unless $image_file =~m(^/); 
+        $image_file = $self->cfg->{paths}{image_dir}.$image_file unless $image_file =~m(^/);
 
-	# Image exists?
+        # Image exists?
         if (not -e $image_file) {
                 return("Image $image_file could not be found");
         }
-	return $self->install_image($image_file, $device_file, $mount_point);
+        return $self->install_image($image_file, $device_file, $mount_point);
 }
 
 =head2 unmount
@@ -620,27 +620,3 @@ sub unmount
 }
 
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd

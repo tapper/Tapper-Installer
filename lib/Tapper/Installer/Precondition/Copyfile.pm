@@ -76,7 +76,7 @@ Install a file from a local source.
 sub install_local {
         my ($self, $file) = @_;
 
-	my $dest_filename = '';   # get rid of the "uninitialised" warning
+        my $dest_filename = '';   # get rid of the "uninitialised" warning
         my ($dest_path, $retval);
 
         if ($file->{dest} =~ m(/$)) {
@@ -91,7 +91,7 @@ sub install_local {
         my ($error, $message) = $self->log_and_exec("cp","--sparse=always","-r","-L",$file->{name},$dest_path.$dest_filename);
         return "Can't copy ".$file->{name}." to $dest_path$dest_filename:$message" if $error;
 
-	return(0);
+        return(0);
 }
 
 
@@ -109,7 +109,7 @@ Install a file from an nfs share.
 sub install_nfs {
         my ($self, $file) = @_;
 
-	my ($filename, $path, $retval, $error);
+        my ($filename, $path, $retval, $error);
         my $nfs_dir='/mnt/nfs';
 
         if ( $file->{name} =~ m,/$, ) {
@@ -120,7 +120,7 @@ sub install_nfs {
         }
 
         $self->makedir($nfs_dir) if not -d $nfs_dir;
-        
+
         $self->log->debug("mount -a $path $nfs_dir");
 
         ($error, $retval) = $self->log_and_exec("mount $path $nfs_dir");
@@ -178,27 +178,3 @@ sub install_rsync {
 
 
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd

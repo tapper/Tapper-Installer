@@ -76,32 +76,32 @@ sub install
         $self->log->debug("executing $command with options ",join (" ",@options));
 
 
-	pipe (my $read, my $write);
-	return ("Can't open pipe:$!") if not (defined $read and defined $write);
+        pipe (my $read, my $write);
+        return ("Can't open pipe:$!") if not (defined $read and defined $write);
 
-	# we need to fork for chroot
-	my $pid = fork();
-	return "fork failed: $!" if not defined $pid;
+        # we need to fork for chroot
+        my $pid = fork();
+        return "fork failed: $!" if not defined $pid;
 
-	# hello child
-	if ($pid == 0) {
+        # hello child
+        if ($pid == 0) {
                 $self->set_env_variables;
 
                 close $read;
-		# chroot to execute script inside the future root file system
+                # chroot to execute script inside the future root file system
                 my ($error, $output) = $self->log_and_exec("mount -o bind /dev/ ".$self->cfg->{paths}{base_dir}."/dev");
                 ($error, $output)    = $self->log_and_exec("mount -t sysfs sys ".$self->cfg->{paths}{base_dir}."/sys");
                 ($error, $output)    = $self->log_and_exec("mount -t proc proc ".$self->cfg->{paths}{base_dir}."/proc");
                 my $arch = $exec->{arch} // "";
                 personality(PER_LINUX32) if $arch eq 'linux32';
-		chroot $self->cfg->{paths}{base_dir};
-		chdir ("/");
+                chroot $self->cfg->{paths}{base_dir};
+                chdir ("/");
                 %ENV = (%ENV, %{$exec->{environment} || {} });
                 ($error, $output)=$self->log_and_exec($command,@options);
                 print( $write $output, "\n") if $output;
                 close $write;
                 exit $error;
-	} else {
+        } else {
                 close $write;
                 my $select = IO::Select->new( $read );
                 my ($error, $output);
@@ -123,34 +123,10 @@ sub install
                 if ($?) {
                         return("executing $command failed");
                 }
-		return(0);
-	}
+                return(0);
+        }
 }
 
 
 
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd

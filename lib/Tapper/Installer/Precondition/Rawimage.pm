@@ -38,7 +38,7 @@ sub install {
 
         return "not filename given for rawimage" if not $img->{name};
 
-        my $img_size = 2048*1024; # 2GByte - size of standard rawimage in kbyte 
+        my $img_size = 2048*1024; # 2GByte - size of standard rawimage in kbyte
 
         my $filename = $img->{name};
         my $path     = $self->cfg->{paths}{base_dir}.$img->{path};
@@ -53,7 +53,7 @@ sub install {
                         return "Can't create $file: $message";
                 }
         }
-        
+
         $filename = $path."/".$filename;
 
         ($error, $retval) = $self->log_and_exec("dd if=/dev/zero of=$filename bs=1024 count=$size");
@@ -61,12 +61,12 @@ sub install {
 
         ($error, $retval) = $self->log_and_exec("/sbin/mkfs.ext3 -F -L tapper $filename");
         return $retval if $error;
-        
+
         $self->makedir($self->cfg->{paths}{guest_mount_dir}) if not -d $self->cfg->{paths}{guest_mount_dir};
         ($error, $retval) = $self->log_and_exec("mount -o loop $filename ".$self->cfg->{paths}{guest_mount_dir});
         return $retval if $error;
         my $mountdir = $self->cfg->{paths}{guest_mount_dir};
-        
+
         mkdir ("$mountdir/etc") or return ("Can't create /etc in raw image $filename: $!");
         open(my $FH,">","$mountdir/etc/tapper-release") or return "Can't open /etc/tapper-release in raw image $filename: $!";
         print $FH "Tapper";
@@ -79,27 +79,3 @@ sub install {
 ;
 
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd

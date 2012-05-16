@@ -35,7 +35,7 @@ Install a file from an nfs share.
 sub install {
         my ($self, $precond) = @_;
 
-	my ($filename, $path, $retval);
+        my ($filename, $path, $retval);
 
         my $basedir = $self->cfg->{paths}{base_dir};
         my $line = $precond->{line};
@@ -49,27 +49,3 @@ sub install {
 }
 
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd

@@ -21,7 +21,7 @@ Tapper::Installer::Precondition::Repository - Install a repository to a given lo
 =cut
 
 
-=head2 git_get 
+=head2 git_get
 
 This function encapsulates getting data out of a git repository.
 
@@ -41,15 +41,15 @@ sub git_get {
         }
         $repo->{target} = $self->cfg->{paths}{base_dir}.$repo->{target};
 
-	my ($error, $retval) = $self->log_and_exec("git","clone","-q",$repo->{url},$repo->{target});
+        my ($error, $retval) = $self->log_and_exec("git","clone","-q",$repo->{url},$repo->{target});
         return($retval) if $error;
-        
+
         if ($repo->{revision}) {
                 chdir ($repo->{target});
                 ($error,$retval) = $self->log_and_exec("git","checkout",$repo->{revision});
                 return($retval) if $error;
         }
-	return(0);
+        return(0);
 }
 
 =head2 hg_get
@@ -61,7 +61,7 @@ This function encapsulates getting data out of a mercurial repository.
 @retval success - 0
 @retval error   - error string
 
-=cut 
+=cut
 
 sub hg_get {
         my ($self, $repo) = @_;
@@ -72,14 +72,14 @@ sub hg_get {
         }
         $repo->{target} = $self->cfg->{paths}{base_dir}.$repo->{target};
 
-	my ($error, $retval) = $self->log_and_exec("hg","clone","-q",$repo->{url},$repo->{target});
+        my ($error, $retval) = $self->log_and_exec("hg","clone","-q",$repo->{url},$repo->{target});
         return($retval) if $error;
-        
+
         if ($repo->{revision}) {
                 ($error, $retval) = $self->log_and_exec("hg","update",$repo->{revision});
                 return($retval) if $error;
         }
-	return(0);
+        return(0);
 }
 
 =head2 svn_get
@@ -122,27 +122,3 @@ sub install {
 }
 
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd
