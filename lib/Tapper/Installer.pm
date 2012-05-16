@@ -1,4 +1,5 @@
 package Tapper::Installer;
+# ABSTRACT: Tapper - Install everything needed for a test
 
 use strict;
 use warnings;
@@ -9,20 +10,6 @@ use URI::Escape "uri_escape";
 
 extends 'Tapper::Base';
 with 'MooseX::Log::Log4perl';
-
-our $VERSION = '3.000010';
-
-=head1 NAME
-
-Tapper::Installer - Tapper - Install everything needed for a test
-
-=head1 SYNOPSIS
-
- use Tapper::Installer;
-
-=head1 FUNCTIONS
-
-=cut
 
 has cfg => (is      => 'rw',
             default => sub { {} },
@@ -35,6 +22,8 @@ sub BUILD
         $self->{cfg}=$config;
 }
 
+=head1 FUNCTIONS
+
 =head2  logdie
 
 Tell the MCP server our current status, then die().
@@ -42,7 +31,6 @@ Tell the MCP server our current status, then die().
 @param string - message to send to MCP
 
 =cut
-
 
 sub logdie
 {
@@ -57,29 +45,3 @@ sub logdie
 
 
 1;
-
-=head1 AUTHOR
-
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
-
-=head1 BUGS
-
-None.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
- perldoc Tapper
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
-
-This program is released under the following license: freebsd
-
-

@@ -28,10 +28,3 @@ foreach my $module(@modules) {
         my $obj = $module->new;
         isa_ok($obj, $module, "Object");
 }
-
-
-
-
-
-
-diag( "Testing Tapper::Installer $Tapper::Installer::VERSION, Perl $], $^X" );
