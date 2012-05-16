@@ -12,7 +12,7 @@ Revision history for {{$dist->name}}
         - [FIX] start script for Debian, and more LSBish
         - [FIX] *lots* of bugs and cornercases everywhere
         - [FIX] default usage of hosts/ports - OSRC#1016
-        - [FIX] messages containing slahes are send as HTTP headers
+        - [FIX] messages containing slashes are sent as HTTP headers
         - [FIX] More elaborated way to get kernel version
         - [RFK] Installer now always get grub config from MCP
         - [RFK] big Dist::Zilla roundhouse kick
