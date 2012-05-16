@@ -266,7 +266,7 @@ sub system_install
                 when ('simnow'){
                         #FIXME: don't use hardcoded path
                         my $simnow_config = $self->cfg->{files}{simnow_config};
-                        $retval = qx(/opt/tapper/bin/perl /opt/tapper/bin/tapper-simnow-start --config=$simnow_config);
+                        $retval = qx(/opt/tapper/perl/perls/current/bin/perl /opt/tapper/perl/perls/current/bin/tapper-simnow-start --config=$simnow_config);
                         if ($?) {
                                 $self->log->error("Can not start simnow: $retval");
                                 $self->mcp_send({state => 'error-install',
