@@ -47,6 +47,8 @@ sub create_common_config
         $config->{paths}           = $self->{cfg}->{paths};
         $config->{files}           = $self->{cfg}->{files} if $self->{cfg}->{files} ;
         $config->{testplan}        = $self->{cfg}->{testplan} if $self->{cfg}->{testplan};
+        $config->{log_to_file}     = $self->{cfg}->{log_to_file};
+
 
         return $config;
 }
