@@ -150,6 +150,11 @@ sub system_install
                 $self->log->warn($retval) if $retval;
         }
 
+        if ($self->cfg->{log_to_file}) {
+                $self->log_to_file('install');
+        }
+
+
         $self->log->info("Installing testrun (".$self->cfg->{testrun_id}.") on host ".$self->cfg->{hostname});
         $self->mcp_inform("start-install") unless $state eq "autoinstall";
 
