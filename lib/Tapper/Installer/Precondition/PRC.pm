@@ -152,7 +152,7 @@ sub install_startscript
                         } elsif ($distro=~m/(redhat)|(fedora)/) {
                                 ($error, $retval)=$self->log_and_exec("chkconfig","--add","tapper");
                         } elsif ($distro=~m/(ubuntu)/) {
-                                ($error, $retval)=$self->log_and_exec("update-rc.d","-f", "tapper", "default");
+                                ($error, $retval)=$self->log_and_exec("update-rc.d","-f", "tapper", "defaults");
                         } elsif ($distro=~/gentoo/) {
                                 ($error, $retval)=$self->log_and_exec("rc-update", "add", "tapper_gentoo", "default");
                         } else {
@@ -314,7 +314,7 @@ sub get_distro
                 my $issue = <$fh>;
                 close $fh;
                 my $distro;
-                ($distro) = $issue =~ m/(Debian)|(Ubuntu)/i;
+                ($distro) = $issue =~ m/(Debian|Ubuntu)/i;
                 return lc($distro) if $distro;
         }
         return "";
