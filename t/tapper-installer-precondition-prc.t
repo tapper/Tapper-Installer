@@ -56,6 +56,7 @@ use Data::Dumper;
 is_deeply($retval, {guest_number => 1,
                     paths =>
                     { base_dir => $tempdir },
+		    log_to_file => undef, 
                     hostname =>  "uruk",
                     mcp_port =>  12345,
                     mcp_server =>  "kupfer",
@@ -91,6 +92,7 @@ is_deeply($retval, {guest_number => 1,
                     hostname =>  "uruk",
                     paths =>
                     { base_dir => $tempdir },
+                    log_to_file => undef,
                     mcp_port =>  12345,
                     mcp_server =>  "kupfer",
                     prc_nfs_server =>  "kupfer",
