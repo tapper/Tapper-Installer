@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - assert OS = Linux
 
 4.0.1     2012-05-16
         - [FEAT] Package precondition now supports url
