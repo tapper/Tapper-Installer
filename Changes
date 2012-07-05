@@ -2,6 +2,11 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
         - assert OS = Linux
+        - [FIX] regexp and typo
+        - [FEAT] install Tapper in Ubuntu
+        - [FEAT] tapper startscript for ubuntu added
+        - [TEST] now has log_to_file in generated PRC config
+        - log_to_file if requested
 
 4.0.1     2012-05-16
         - [FEAT] Package precondition now supports url
