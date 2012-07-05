@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+4.0.2     2012-07-05
         - assert OS = Linux
         - [FIX] regexp and typo
         - [FEAT] install Tapper in Ubuntu
