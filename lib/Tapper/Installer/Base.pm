@@ -241,7 +241,9 @@ sub system_install
                 }
         }
 
-        $self->cleanup() unless $config->{no_cleanup} or $state eq 'simnow' or $state eq 'ssh';
+        if ($state eq 'standard' and not  $config->{no_cleanup}) {
+                $self->cleanup();
+        }
 
         if ( $state eq "standard" and  not ($config->{skip_prepare_boot})) {
                 $self->logdie($retval) if $retval = $image->prepare_boot();
