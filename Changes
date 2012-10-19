@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - [FIX] when to call log cleanup
 
 4.0.2     2012-07-05
         - assert OS = Linux
