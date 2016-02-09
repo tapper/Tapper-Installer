@@ -41,8 +41,7 @@ sub install
         my ($self, $package) = @_;
         if ($package->{url}) {
                 my ($proto, $fullpath) = $package->{url} =~ m|^(\w+)://(.+)$|;
-                given($proto) {
-                        when ('nfs') {
+                if ($proto eq 'nfs') {
                                 my $nfs_dir='/mnt/nfs';
                                 $self->makedir($nfs_dir);
                                 my $path = dirname $fullpath;
@@ -55,8 +54,7 @@ sub install
                                 ($error, $retval) = $self->log_and_exec("umount $nfs_dir");
                                 return 0;
                         }
-                        default { return ("Procol'$proto' is not supported") }
-                }
+                        else { return ("Procol'$proto' is not supported") }
         }
 
 
@@ -82,37 +80,35 @@ sub install
 
         my $output;
         $self->log->debug("type is $type");
-        given($type){
-                when("gzip") {
+        if ($type eq "gzip") {
                         ($error, $output) = $self->log_and_exec("tar --no-same-owner -C $basedir -xzf $pkg");
                         return("can't unpack package $filename: $output\n") if $error;
                 }
-                when("tar") {
+                elsif ($type eq "tar") {
                         ($error, $output) = $self->log_and_exec("tar --no-same-owner -C $basedir -xf $pkg");
                         return("can't unpack package $filename: $output\n") if $error;
                 }
-                when("bz2") {
+                elsif ($type eq "bz2") {
                         ($error, $output) = $self->log_and_exec("tar --no-same-owner -C $basedir -xjf $pkg");
                         return("can't unpack package $filename: $output\n") if $error;
                 }
-                when("deb") {
+                elsif ($type eq "deb") {
                         system("cp $pkg $basedir/");
                         $pkg = basename $pkg;
                         my $exec = Tapper::Installer::Precondition::Exec->new($self->cfg);
                         return $exec->install({command => "dpkg -i $pkg"});
                 }
-                when("rpm") {
+                elsif ($type eq "rpm") {
                         system("cp $pkg $basedir/");
                         $pkg = basename $pkg;
                         my $exec = Tapper::Installer::Precondition::Exec->new($self->cfg);
                         # use -U to overwrite possibly existing	older package
                         return $exec->install({command => "rpm -U  $pkg"});
                 }
-                default{
+                else {
                         $self->log->warn(qq($pkg is of unrecognised file type "$type"));
                         return(qq($pkg is of unrecognised file type "$type"));
                 }
-        }
         return(0);
 }
 
