@@ -517,7 +517,7 @@ Install an image of type tar.gz.
 @param int    - size of the target partition
 @param string - device name of the target partition
 @param string - directory to mount the installed image to
-@param string - partition labeö
+@param string - partition label
 
 @return success - 0
 @return error   - error string
@@ -548,7 +548,7 @@ Install an image of type tar.bz2.
 @param int    - size of the target partition
 @param string - device name of the target partition
 @param string - directory to mount the installed image to
-@param string - partition labeö
+@param string - partition label
 
 @return success - 0
 @return error   - error string
