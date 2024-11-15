@@ -262,15 +262,14 @@ sub system_install
         $self->mcp_inform("end-install");
         $self->log->info("Finished installation of test machine");
 
-        given ($state){
-                when ("standard"){
+                if ($state eq "standard"){
                         return 0 if $config->{installer_stop};
                         system("sync");
                         system("sync");
                         system("sync");
                         system("reboot");
                 }
-                when ('simnow'){
+                elsif ($state eq 'simnow'){
                         #FIXME: don't use hardcoded path
                         my $simnow_config = $self->cfg->{files}{simnow_config};
                         $retval = qx(/opt/tapper/perl/perls/current/bin/perl /opt/tapper/perl/perls/current/bin/tapper-simnow-start --config=$simnow_config);
@@ -282,7 +281,6 @@ sub system_install
                         }
 
                 }
-        }
         return 0;
 }
 
