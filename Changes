@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - replace given/when with if/else for newer Perl versions
+        - replace hardcoded log4perl cfg file with Tapper::Config entry
 
 5.0.1     2022-05-23
         - weak deps to Linux::Personality
