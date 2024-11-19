@@ -2,8 +2,6 @@ package Tapper::Installer::Base;
 
 use Moose;
 
-use common::sense;
-
 use Tapper::Remote::Config;
 use Tapper::Installer::Precondition::Copyfile;
 use Tapper::Installer::Precondition::Exec;

@@ -1,7 +1,6 @@
 package Tapper::Installer::Precondition::Simnow;
 
 use Moose;
-use common::sense;
 
 use Tapper::Installer::Precondition::PRC;
 use YAML;
